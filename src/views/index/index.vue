@@ -1,5 +1,5 @@
 <template>
-	<div>11111111111111</div>
+	<router-view></router-view>
 </template>
 <script>
 export default {
