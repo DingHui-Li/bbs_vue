@@ -1,6 +1,5 @@
 <template>
-    <div style="height:100vh;width:100%;position:fixed;
-    background-image:url('http://e.hiphotos.baidu.com/lvpics/w=1000/sign=e6547bab4890f60304b098470922b11b/f603918fa0ec08fa3debe43d5bee3d6d54fbda45.jpg')">
+    <div id="logniPanel">
         <div style="height:100vh;width:100%;position:fixed;background-color:rgba(0,0,0,0.4)">  
             <el-row type="flex" justify="center" align="middle" style="height:100%;">
                     <el-col :xs="18" :sm="14" :md="12" :lg="8" :xl='4'>
@@ -28,7 +27,26 @@
             <span slot="footer" class="dialog-footer">
                 <el-button @click="loginDialog = false">取 消</el-button>
                 <el-button type="primary" @click="loginDialog = false">登 录</el-button>
-                <div align="center" style="margin-top:30px;color:#454545">没有账号？<span style="color:#409EFF;cursor:pointer" @click="register">去注册</span></div>
+                <div align="center" style="margin-top:30px;color:#454545">没有账号？<span style="color:#409EFF;cursor:pointer" @click="registerDialog=true;loginDialog=false">去注册</span></div>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="registerDialog"  center :append-to-body='true'>
+            <span>
+                <div style="font-size:5rem;color:#409EFF;margin-bottom:20px" align="center">logo</div>
+                <el-input v-model="name" maxlength="20"  show-word-limit minlength="2">
+                    <template slot="prepend">账号</template>
+                </el-input>
+                <el-input type="password" v-model="pw" maxlength="20" show-word-limit minlength="6" show-password>
+                    <template slot="prepend">密码</template>
+                </el-input>
+                <el-input type="password" v-model="pw" maxlength="20" show-word-limit minlength="6" show-password>
+                    <template slot="prepend">确认密码</template>
+                </el-input>
+            </span>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="loginDialog = false">取 消</el-button>
+                <el-button type="primary" @click="loginDialog = false">注册</el-button>
+                <div align="center" style="margin-top:30px;color:#454545">已有账号？<span style="color:#409EFF;cursor:pointer" @click="loginDialog=true;registerDialog=false">去登录</span></div>
             </span>
         </el-dialog>
     </div>
@@ -39,14 +57,12 @@ export default {
     data(){
         return{
             loginDialog:false,
+            registerDialog:false,
             name:'',
             pw:''
         }
     },
     methods:{
-       register(){
-           this.$router.replace("/register");
-       }
     }
 }
 </script>
@@ -58,5 +74,11 @@ export default {
         border-radius:30px;
         padding:8px 45px;
         border:none
+    }
+    #loginPanel{
+        height:100vh;
+        width:100%;
+        position:fixed;
+        background-image:'url('+require('../../assets/bg.jpg')+')'
     }
 </style>

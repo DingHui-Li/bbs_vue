@@ -1,61 +1,67 @@
 <template>
-    <el-row :gutter="40">    
-        <el-col :span='24'>
-            <el-col :md="3" class="hidden-sm-and-down">
-                logo
-            </el-col>
-            <el-col :xs="3" :sm="3" class="hidden-md-and-up">
-                <i class="fa fa-bars" aria-hidden="true" @click="sideNav=true"></i>
-            </el-col>
-            <el-col :md="6" :xs="18" :sm="18">
-                <el-input placeholder="查找你感兴趣的内容"></el-input>
-            </el-col>
-            <el-col :md="12" class="hidden-sm-and-down">
-                <el-tabs @tab-click="handleClick" v-model="actTab">
-                    <el-tab-pane v-for="tab in tabs" :key="tab.name+1" :label="tab.name" :name="tab.to">
-                    </el-tab-pane>
-                </el-tabs>
-            </el-col>
-            <el-col :md="3" :xs="3" :sm="3">
-                <el-dropdown>
-                    <!-- <el-avatar :size="40" src='http://pic39.nipic.com/20140320/12795880_110914420143_2.jpg'></el-avatar> -->
-                    <img src="http://pic39.nipic.com/20140320/12795880_110914420143_2.jpg" style="width:40px;height:40px;border-radius:50%" @click="login()">
-                    <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item>登出</el-dropdown-item>
-                    </el-dropdown-menu>
-                </el-dropdown>
-            </el-col>
-        </el-col>
-        <transition name="el-fade-in-linea">
-            <div style="width:100vw;height:100vh;position:fixed;z-index:999;background-color:rgba(0,0,0,.3)" v-if="sideNav" @click="sideNav=false">
-                <el-menu style="width:300px;height:100vh;position:fixed;">
-                    <el-menu-item v-for="tab in tabs" :key="tab.name+2" align="center" @click="$router.replace(tab.to)">
+    <el-container style="padding:0;">
+        <el-header style="padding:0;border-bottom:1px solid #e0e0e0"> 
+                <el-menu mode="horizontal" :default-active="active" style="float:right;" id="menu">
+                    <el-menu-item>
+                        logo
+                    </el-menu-item>
+                    <el-menu-item class="hidden-md-and-up">
+                        <i class="fa fa-bars" aria-hidden="true" @click="sideNav=true"></i>
+                    </el-menu-item>
+                    <el-menu-item >
+                        <search />
+                    </el-menu-item>
+                    <el-menu-item v-for="(tab) in tabs" :key="tab.name+1" @click="$router.replace(tab.to)" :index="tab.to">
                         {{tab.name}}
                     </el-menu-item>
+                    <el-submenu index="5">
+                        <template slot="title">消息</template>
+                        <el-menu-item index="5-1">系统通知</el-menu-item>
+                        <el-menu-item index="5-2">短消息</el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="6">
+                        <template slot="title">
+                            <img src="http://pic39.nipic.com/20140320/12795880_110914420143_2.jpg" style="width:40px;height:40px;border-radius:50%" @click="login()">
+                        </template>       
+                        <el-menu-item index="6-1">个人主页</el-menu-item>    
+                        <el-menu-item index="6-2">登出</el-menu-item>       
+                    </el-submenu>
                 </el-menu>
-            </div>
-        </transition>
-        <el-col :span="24">
+                <transition name="el-fade-in-linea">
+                    <div style="width:100vw;height:100vh;position:fixed;z-index:999;background-color:rgba(0,0,0,.3)" v-if="sideNav" @click="sideNav=false">
+                        <el-menu style="width:300px;height:100vh;position:fixed;">
+                            <el-menu-item v-for="tab in tabs" :key="tab.name+2" align="center" @click="$router.replace(tab.to)">
+                                {{tab.name}}
+                            </el-menu-item>
+                        </el-menu>
+                    </div>
+                </transition>
+        </el-header>
+        <el-main style="padding:0">
             <router-view></router-view>
-        </el-col>
-    </el-row>
+        </el-main>
+    </el-container>
 </template>
 <script>
+import search from '../components/search'
 export default {
     name:'toolbar',
+    components:{search},
     data(){
         return{
             tabs:[{'name':'首页','to':'/home'},
                     {'name':'精选','to':'/selected'},
                     {'name':'板块','to':'/plate'},
-                    {'name':'公告'},
-                    {'name':'成为会员',to:'/register'},],
-            actTab:"",
-            sideNav:false
+                    {'name':'公告','to':'/notice'},
+                    ],
+            sideNav:false,
+            active:'/home',
+            state:''
         }
     },
     mounted:function(){
-        this.actTab=this.$route.path;
+        this.active=this.$route.path;
+        this.center();
     },
     methods:{
         tabChange:function(){
@@ -67,13 +73,14 @@ export default {
         },
         login:function(){
             this.$router.replace("/login");
+        },
+        center(){
+            let ele=document.getElementById("menu");
+            let width=ele.offsetLeft;
+            ele.style.marginRight=width/2+'px';
         }
     },
     watch:{
-        $route:function(to,form){
-            if(to.path=="/login") this.actTab=form.path;
-            else  this.actTab=to.path;
-        }
     }
 }
 </script>
