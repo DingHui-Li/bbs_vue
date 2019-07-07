@@ -1,10 +1,12 @@
 <template>
-    <div id="logniPanel">
+    <div :style="{height:'100vh',width:'100%',position:'fixed',left:0,top:0,zIndex:-1,backgroundImage:'url('+require('../../../assets/bg.png')+')'}">
         <div style="height:100vh;width:100%;position:fixed;background-color:rgba(0,0,0,0.4)">  
             <el-row type="flex" justify="center" align="middle" style="height:100%;">
                     <el-col :xs="18" :sm="14" :md="12" :lg="8" :xl='4'>
                         <el-card style="box-shadow:none;background:none;border:none">
-                                <div style="font-size:5rem;color:#fff">logo</div>
+                                <div style="font-size:5rem;color:#fff">
+                                    <img :src="require('../../../assets/logo.png')" alt="">
+                                </div>
                                 <div style="font-size:1.7rem;color:#fff;margin-top:20px">登录狗扑</div>
                                 <div style="font-size:1.7rem;color:#fff">分享你的生活</div>
                                 <div style="margin-top:50px">
@@ -16,7 +18,7 @@
         </div>
         <el-dialog :visible.sync="loginDialog"  center :append-to-body='true'>
             <span>
-                <div style="font-size:5rem;color:#409EFF;margin-bottom:20px" align="center">logo</div>
+                <div style="font-size:5rem;color:#409EFF;margin-bottom:20px" align="center"> <img :src="require('../../../assets/logo.png')" alt=""></div>
                 <el-input v-model="name" maxlength="20"  show-word-limit minlength="2">
                     <template slot="prepend">账号</template>
                 </el-input>
@@ -32,7 +34,7 @@
         </el-dialog>
         <el-dialog :visible.sync="registerDialog"  center :append-to-body='true'>
             <span>
-                <div style="font-size:5rem;color:#409EFF;margin-bottom:20px" align="center">logo</div>
+                <div style="font-size:5rem;color:#409EFF;margin-bottom:20px" align="center"> <img :src="require('../../../assets/logo.png')" alt=""></div>
                 <el-input v-model="name" maxlength="20"  show-word-limit minlength="2">
                     <template slot="prepend">账号</template>
                 </el-input>
@@ -59,7 +61,7 @@ export default {
             loginDialog:false,
             registerDialog:false,
             name:'',
-            pw:''
+            pw:'',
         }
     },
     methods:{
@@ -76,9 +78,6 @@ export default {
         border:none
     }
     #loginPanel{
-        height:100vh;
-        width:100%;
-        position:fixed;
-        background-image:'url('+require('../../assets/bg.jpg')+')'
+       
     }
 </style>

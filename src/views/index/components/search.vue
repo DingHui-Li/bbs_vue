@@ -1,6 +1,7 @@
 <template>
-    <el-autocomplete placeholder="查找你感兴趣的内容"  v-model="state"
-            prefix-icon="el-icon-search" clearable :fetch-suggestions="querySearch"></el-autocomplete>    
+    <el-autocomplete placeholder="查找你感兴趣的内容"  v-model="state" style="background:none;"
+            prefix-icon="el-icon-search" clearable :fetch-suggestions="querySearch">
+    </el-autocomplete>    
 </template>
 <script>
 export default {

@@ -1,0 +1,1 @@
+export const imgHost="http://lidh.top:8084/imgservice"

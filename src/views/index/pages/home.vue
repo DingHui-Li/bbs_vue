@@ -1,39 +1,56 @@
 <template>
     <el-row type="flex" justify="center" :gutter="20">
-        <el-col :lg='18' :md='20' :xs='24'>
-            <el-col>
-                <el-tabs stretch style="color:#000" v-model="actPlateIndex" @tab-click="handleClick">
-                    <el-tab-pane v-for="(plate,index) in plates" :key="'tab_'+plate.plate_name" :label="plate.plate_name" :name="index+''"> </el-tab-pane>
-                </el-tabs>
-            </el-col>
-            <el-col>
-                <swiper :options="swiperOpt" style="height:100vh" ref="mySwiper">
-                    <swiper-slide v-for="plate in plates" :key="plate.plate_name" :name="plate.plate_name">
-                        <el-col>
-                            <el-tabs v-model="actDistrictIndex" @tab-click="handleClick2">
-                                <el-tab-pane v-for="(district,index2) in plate.districts" :key="'tab_'+district.district_name" :label="district.district_name" :name="index2+''">
-                                </el-tab-pane>
-                            </el-tabs>
-                        </el-col>
-                        <el-col>
-                            <swiper :options="swiperOpt2" style="height:100vh" ref="mySwiper2">
-                                <swiper-slide  v-for="district in plate.districts" :key="district.district_name">
-                                    <notice />
-                                </swiper-slide>
-                            </swiper>
-                        </el-col>
-                    </swiper-slide>
-                </swiper>
-            </el-col>
+        <el-col :lg='18' :md='20' :xs='24' style="padding:0">
+            <el-card style="padding:0;box-shadow:none;border:none">
+                <el-col style="padding:0">
+                    <el-tabs stretch style="color:#000;box-shadow:none;border:none;" v-model="actPlateIndex" @tab-click="handleClick" type="border-card">
+                        <el-tab-pane v-for="(plate,index) in plates" :key="'tab_'+plate.plate_name" :label="plate.plate_name" :name="index+''">
+                        </el-tab-pane>
+                    </el-tabs>
+                </el-col>
+                <el-col>
+                    <swiper :options="swiperOpt" style="height:100vh;touch-action: none;" ref="mySwiper">
+                        <swiper-slide v-for="plate in plates" :key="plate.plate_name" :name="plate.plate_name">
+                            <el-col>
+                                <el-tabs stretch v-model="actDistrictIndex" @tab-click="handleClick2">
+                                    <el-tab-pane v-for="(district,index2) in plate.districts" :key="'tab_'+district.district_name" :label="district.district_name" :name="index2+''">
+                                    </el-tab-pane>
+                                </el-tabs>
+                            </el-col>
+                            <el-col>
+                                <swiper :options="swiperOpt2" style="height:100vh" ref="mySwiper2">
+                                    <swiper-slide  v-for="district in plate.districts" :key="district.district_name">
+                                        <notice />
+                                        <el-col style="margin:20px 0" align="end">
+                                            帖子排序：
+                                            <el-radio-group v-model="sort" >
+                                                <el-radio-button label="最新发布"></el-radio-button>
+                                                <el-radio-button label="最新回复"></el-radio-button>
+                                                <el-radio-button label="回复数"></el-radio-button>
+                                                <el-radio-button label="浏览量"></el-radio-button>
+                                            </el-radio-group>
+                                        </el-col>
+                                        <el-col :xl="6" :md="8" :sm="12" :xs="24" v-for="i in 9" :key="i">
+                                            <post></post>
+                                        </el-col>
+                                    </swiper-slide>
+                                </swiper>
+                            </el-col>
+                        </swiper-slide>
+                    </swiper>
+                </el-col>
+            </el-card>
         </el-col>
     </el-row>
 </template>
 <script>
 import notice from '../components/notice'
+import post from '../components/post'
 export default {
-    components:{notice},
+    components:{notice,post},
     data(){
         return{
+            sort:'最新发布',
             swiperOpt:{
                 on: {
                     slideChangeTransitionEnd:()=>{//使slide与tab同步
@@ -47,19 +64,24 @@ export default {
                 on: {
                     slideChangeTransitionEnd:()=>{//使slide与tab同步
                         this.actDistrictIndex=this.swiper2().activeIndex+'';
-                       // console.log(this.swiper2())
-                    }
+
+                    },
                 }
             },
             plates:[
-                {"plate_name":'综合'},
+                {"plate_name":'综合',
+                    'districts':[{'district_name':'发现'}]},
                 {"plate_name":'时尚',
                     'districts':[
                         {'district_name':'发现'},
                         {'district_name':'美妆'},
                         {'district_name':'穿搭'}]},
-                {'plate_name':'美食'},
-                {'plate_name':'旅行'},
+                {'plate_name':'美食',
+                    'districts':[
+                        {'district_name':'发现'}]},
+                {'plate_name':'旅行',
+                    'districts':[
+                        {'district_name':'发现'}]},
                 {'plate_name':'体育'},
                 {'plate_name':'健康'},
                 {'plate_name':'游戏'},
@@ -87,11 +109,13 @@ export default {
             this.swiper2().activeIndex="0";
         },
         handleClick2(tab, event) {
-            this.swiper2.slideTo(tab.name);//使tab与slide同步
+            this.swiper2().slideTo(tab.name);//使tab与slide同步
         }
     }
 }
 </script>
 <style>
-
+    .el-card__body{
+        padding:0
+    }
 </style>

@@ -1,6 +1,6 @@
 <template>
     <el-col>
-        <el-card style="border-radius:20px;border:2px solid #6699FF">
+        <el-card style="border-radius:20px;border:2px solid #6699FF;padding:20px">
             <el-row  >
                 <el-col>
                     <span>子木</span> <span>2019-7-6</span>
