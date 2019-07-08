@@ -6,8 +6,6 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import 'element-ui/lib/theme-chalk/display.css';
 
-import "../../assets/fontawesome-free-5.9.0-web/css/all.css"
-
 import VueAwesomeSwiper from 'vue-awesome-swiper'
 import 'swiper/dist/css/swiper.css'
 
@@ -46,8 +44,9 @@ Vue.use(ElementUI);
 Vue.use(VueRouter);
 Vue.use(VueAwesomeSwiper);
 Vue.use(vueAxios,axios);
+axios.defaults.withCredentials=true;
 axios.interceptors.request.use(request=>{
-	request.headers['Authorization']=localStorage['token'];
+	// request.headers['Authorization']=localStorage['token'];
 	console.log(request.headers);
 	// request.headers['X-Requested-With']="XMLHttpRequest";
 	return request;

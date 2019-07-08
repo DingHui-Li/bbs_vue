@@ -15,7 +15,7 @@
                 <span>昵称昵称昵</span>
             </el-col>
             <el-col :span="5" left>
-                <i class="far fa-thumbs-up"></i>
+                <i class="fa fa-heart-o" aria-hidden="true"></i>
                 <span style="margin-left:5px">0</span>
             </el-col>
             <el-col :span="5" left>
@@ -30,7 +30,6 @@ export default {
     name:'post',
     methods:{
         postClick(id){
-            alert(id)
             this.$router.push(`/content/${id}`);
         }
     }
