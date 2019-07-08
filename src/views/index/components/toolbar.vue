@@ -19,11 +19,11 @@
                         <el-menu-item index="5-1" align="center">系统通知<el-badge :value="1" style="margin-left:5px"></el-badge></el-menu-item>
                         <el-menu-item index="5-2" align="center">短消息<el-badge :value="1" style="margin-left:5px"></el-badge></el-menu-item>
                     </el-submenu>
-                    <el-submenu index="6">
+                    <el-submenu index="6" class="hidden-sm-and-down">
                         <template slot="title">
                             <img src="http://pic39.nipic.com/20140320/12795880_110914420143_2.jpg" style="width:40px;height:40px;border-radius:50%" @click="login()">
                         </template>       
-                        <el-menu-item index="6-1" align="center" @click="$router.replace('/person')">个人主页</el-menu-item>    
+                        <el-menu-item index="/person" align="center" @click="$router.replace('/person')">个人主页</el-menu-item>    
                         <el-menu-item index="6-2" align="center">登出</el-menu-item>       
                     </el-submenu>
                 </el-menu>

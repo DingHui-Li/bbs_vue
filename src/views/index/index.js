@@ -25,6 +25,7 @@ const plate=()=>import('./pages/plate')
 const notice=()=>import('./pages/notice')
 const person=()=>import('./pages/person')
 const publish=()=>import('./pages/publish')
+const content=()=>import('./pages/content')
 
 
 const routes=[{path:'/',component:toolbar,children:[
@@ -36,6 +37,7 @@ const routes=[{path:'/',component:toolbar,children:[
 					{path:'login',component:login},	
 					{path:'person',component:person},
 					{path:'publish',component:publish},
+					{path:'content/:id',component:content},
 				]},]
 const router=new VueRouter({routes})
 
@@ -43,8 +45,13 @@ const router=new VueRouter({routes})
 Vue.use(ElementUI);
 Vue.use(VueRouter);
 Vue.use(VueAwesomeSwiper);
-Vue.use(vueAxios,axios)
-
+Vue.use(vueAxios,axios);
+axios.interceptors.request.use(request=>{
+	request.headers['Authorization']=localStorage['token'];
+	console.log(request.headers);
+	// request.headers['X-Requested-With']="XMLHttpRequest";
+	return request;
+})
 new Vue({
 	router,
 	render:h=>h(Index)

@@ -28,7 +28,7 @@
             </span>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="loginDialog = false">取 消</el-button>
-                <el-button type="primary" @click="loginDialog = false">登 录</el-button>
+                <el-button type="primary" @click="login">登 录</el-button>
                 <div align="center" style="margin-top:30px;color:#454545">没有账号？<span style="color:#409EFF;cursor:pointer" @click="registerDialog=true;loginDialog=false">去注册</span></div>
             </span>
         </el-dialog>
@@ -54,6 +54,7 @@
     </div>
 </template>
 <script>
+import {apiHost} from '../../../../apiConfig.js'
 export default {
     name:'login',
     data(){
@@ -65,6 +66,26 @@ export default {
         }
     },
     methods:{
+        login(){
+            this.loginDialog = false;
+            this.axios({
+                url:apiHost+"/login",
+                method:'post',
+                data:{'user_name':this.name,'password':this.pw}
+            }).then((res)=>{
+                localStorage['token']=res.data.token;
+                console.log(res)
+                console.log(localStorage['token']);
+            })
+        }
+    },
+    mounted(){
+        // this.axios({
+        //      url:apiHost+'/login',
+        //      method:'get'
+        // }).then(res=>{
+        //     console.log(res)
+        // })
     }
 }
 </script>
