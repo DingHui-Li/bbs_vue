@@ -1,6 +1,7 @@
 <template>
     <el-container style="padding:0;margin:0">
         <el-header style="padding:0;border-bottom:1px solid #e0e0e0;margin-top:10px;background:none;"> 
+            <keep-alive>
                 <el-menu mode="horizontal" :default-active="active" style="float:right;background:none;" id="menu">
                     <el-menu-item class="hidden-sm-and-down">
                         <img :src="require('../../../assets/logo.png')" style="width:50px">
@@ -21,7 +22,7 @@
                     </el-submenu>
                     <el-submenu index="6" class="hidden-sm-and-down">
                         <template slot="title">
-                            <img src="http://pic39.nipic.com/20140320/12795880_110914420143_2.jpg" style="width:40px;height:40px;border-radius:50%" @click="login()">
+                            <img :src="icon" style="width:40px;height:40px;border-radius:50%" @click="login()">
                         </template>       
                         <el-menu-item index="/person" align="center" @click="$router.replace('/person')">个人主页</el-menu-item>    
                         <el-menu-item index="6-2" align="center">登出</el-menu-item>       
@@ -36,13 +37,15 @@
                         </el-menu>
                     </div>
                 </transition>
+                </keep-alive>
         </el-header>
         <el-main style="padding:0;">
-            <router-view style="margin:0;padding:0"></router-view>
+            <router-view style="margin:0;padding:0" @getUserInfo="getUserInfo"></router-view>
         </el-main>
     </el-container>
 </template>
 <script>
+import {apiHost} from '../../../../apiConfig.js'
 import search from '../components/search'
 export default {
     name:'toolbar',
@@ -56,7 +59,14 @@ export default {
                     ],
             sideNav:false,
             active:'/home',
-            state:''
+            state:'',
+            userInfo:{}
+        }
+    },
+    computed:{
+        icon(){
+            if(localStorage['userIcon']!=undefined)
+                return apiHost+localStorage['userIcon'];
         }
     },
     mounted:function(){
@@ -78,6 +88,11 @@ export default {
             let ele=document.getElementById("menu");
             let width=ele.offsetLeft;
             ele.style.marginRight=width/2+'px';
+        },
+        getUserInfo(info){
+            this.userInfo=info;
+            localStorage['userIcon']=info.icon;
+            localStorage['userId']=info.id;
         }
     },
     watch:{

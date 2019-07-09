@@ -16,7 +16,7 @@
                         <el-col :span="5" style="margin-top:10px">
                             <el-avatar src="http://pic1.win4000.com/wallpaper/c/57918d798786e.jpg" :size="60"></el-avatar>
                         </el-col>
-                        <el-col :span="19" style="margin-top:10px">
+                        <el-col :span="19" style="margin-top:10px;">
                             <div style="font-weight:bold;margin-top:5px">任我行</div>
                             <div style="color:#757575;margin-top:5px">我好想回家啊</div>
                         </el-col>

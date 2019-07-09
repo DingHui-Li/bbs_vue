@@ -12,6 +12,8 @@ import 'swiper/dist/css/swiper.css'
 import vueAxios from 'vue-axios'
 import axios from 'axios'
 
+import animated from 'animate.css'
+
 
 // ===============================================
 const toolbar=()=>import('./components/toolbar')
@@ -45,11 +47,22 @@ Vue.use(VueRouter);
 Vue.use(VueAwesomeSwiper);
 Vue.use(vueAxios,axios);
 axios.defaults.withCredentials=true;
-axios.interceptors.request.use(request=>{
-	// request.headers['Authorization']=localStorage['token'];
-	console.log(request.headers);
-	// request.headers['X-Requested-With']="XMLHttpRequest";
-	return request;
+// axios.interceptors.request.use(request=>{
+// 	// request.headers['Authorization']=localStorage['token'];
+// 	// request.headers['X-Requested-With']="XMLHttpRequest";
+// 	return request;
+// })
+axios.interceptors.response.use(response=>{
+	console.log(response)
+	if(response.status==200){
+		return response;
+	}
+	else{
+		this.$notify.error({
+			title: '错误',
+			message: response.statusText
+		});
+	}
 })
 new Vue({
 	router,
