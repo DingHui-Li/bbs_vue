@@ -50,8 +50,7 @@ export default {
                     target:tabCard,
                     lock: true,
                     text: 'Loading',
-                    spinner: 'el-icon-loading',
-                    background: 'rgba(0, 0, 0, 0.1)'
+                    spinner: 'el-icon-loading'
             });
         }
     },
@@ -62,10 +61,9 @@ export default {
                 url:apiHost+"/anon/plate/getPlates",
                 method:"get"
             }).then(res=>{
-                this.plates=res.data;
-                loading.close();
-            }).catch(error=>{
-                this.$message.error(error.message);
+                if(res!=undefined){
+                    this.plates=res.data;
+                }
                 loading.close();
             })
         },

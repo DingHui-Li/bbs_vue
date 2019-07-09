@@ -1,6 +1,6 @@
 <template>
     <el-container style="padding:0;margin:0">
-        <el-header style="padding:0;border-bottom:1px solid #e0e0e0;margin-top:10px;background:none;"> 
+        <el-header style="padding:0;border-bottom:1px solid #e0e0e0;margin-top:10px;background:none;z-index:1"> 
             <keep-alive>
                 <el-menu mode="horizontal" :default-active="active" style="float:right;background:none;" id="menu">
                     <el-menu-item class="hidden-sm-and-down">
@@ -17,8 +17,8 @@
                     </el-menu-item>
                     <el-submenu index="5" class="hidden-sm-and-down">
                         <template slot="title">消息 <el-badge :value="2"></el-badge></template>  
-                        <el-menu-item index="5-1" align="center">系统通知<el-badge :value="1" style="margin-left:5px"></el-badge></el-menu-item>
-                        <el-menu-item index="5-2" align="center">短消息<el-badge :value="1" style="margin-left:5px"></el-badge></el-menu-item>
+                        <el-menu-item index="/news/system" align="center" @click="$router.replace(`/news/${'system'}`)">系统通知<el-badge :value="1" style="margin-left:5px"></el-badge></el-menu-item>
+                        <el-menu-item index="news/msg" align="center" @click="$router.replace(`/news/${'msg'}`)">短消息<el-badge :value="1" style="margin-left:5px"></el-badge></el-menu-item>
                     </el-submenu>
                     <el-submenu index="6" class="hidden-sm-and-down">
                         <template slot="title">
@@ -39,7 +39,7 @@
                 </transition>
                 </keep-alive>
         </el-header>
-        <el-main style="padding:0;">
+        <el-main style="padding:0;background-color:#e0e0e0;min-height:100vh">
             <router-view style="margin:0;padding:0" @getUserInfo="getUserInfo"></router-view>
         </el-main>
     </el-container>
@@ -74,6 +74,9 @@ export default {
         this.center();
     },
     methods:{
+        test(){
+            alert('test')
+        },
         tabChange:function(){
             this.drawer=!this.drawer;
         },

@@ -1,5 +1,5 @@
 <template>
-    <div :style="{height:'100vh',width:'100%',position:'fixed',left:0,top:0,zIndex:-1,backgroundImage:'url('+require('../../../assets/bg.png')+')'}">
+    <div :style="{height:'100vh',width:'100%',position:'fixed',left:0,top:0,zIndex:0,backgroundImage:'url('+require('../../../assets/bg.png')+')'}">
         <div style="height:100vh;width:100%;position:fixed;background-color:rgba(0,0,0,0.4)">  
             <el-row type="flex" justify="center" align="middle" style="height:100%;">
                     <el-col :xs="18" :sm="14" :md="12" :lg="8" :xl='4'>

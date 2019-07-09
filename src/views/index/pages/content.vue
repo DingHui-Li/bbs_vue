@@ -109,11 +109,11 @@ export default {
     components:{comment},
     data(){
         return{
-
+            id:this.$route.params.id
         }
     },
     mounted(){
-        console.log(this.$route.params['id']);
+        
     }
 }
 </script>

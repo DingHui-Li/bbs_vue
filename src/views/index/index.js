@@ -26,7 +26,7 @@ const notice=()=>import('./pages/notice')
 const person=()=>import('./pages/person')
 const publish=()=>import('./pages/publish')
 const content=()=>import('./pages/content')
-
+const news=()=>import('./pages/news')
 
 const routes=[{path:'/',component:toolbar,children:[
 					{path:'/',redirect:'home'},
@@ -38,6 +38,7 @@ const routes=[{path:'/',component:toolbar,children:[
 					{path:'person',component:person},
 					{path:'publish',component:publish},
 					{path:'content/:id',component:content},
+					{path:'news/:type',component:news},
 				]},]
 const router=new VueRouter({routes})
 
@@ -47,22 +48,11 @@ Vue.use(VueRouter);
 Vue.use(VueAwesomeSwiper);
 Vue.use(vueAxios,axios);
 axios.defaults.withCredentials=true;
-// axios.interceptors.request.use(request=>{
-// 	// request.headers['Authorization']=localStorage['token'];
-// 	// request.headers['X-Requested-With']="XMLHttpRequest";
-// 	return request;
-// })
-axios.interceptors.response.use(response=>{
-	console.log(response)
-	if(response.status==200){
-		return response;
-	}
-	else{
-		this.$notify.error({
-			title: '错误',
-			message: response.statusText
-		});
-	}
+axios.interceptors.request.use(request=>{return request;},error=>{
+	alert(error)
+})
+axios.interceptors.response.use(response=>{return response;},error=>{
+	alert(error)
 })
 new Vue({
 	router,

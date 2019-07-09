@@ -34,12 +34,12 @@
 			</el-card>
 			<el-tabs stretch>
 				<el-tab-pane label="帖子">
-					<el-col :sm="12" :xs="24" v-for="i in 9" :key="i">
+					<el-col :sm="12" :xs="24" v-for="i in 9" :key="i" v-if="postData.length>0">
 						<post></post>
 					</el-col>
 				</el-tab-pane>
 				<el-tab-pane label="收藏">
-					<el-col :sm="12" :xs="24" v-for="i in 9" :key="i">
+					<el-col :sm="12" :xs="24" v-for="i in 9" :key="i"  v-if="markData.length>0">
 						<post></post>
 					</el-col>
 				</el-tab-pane>
@@ -53,6 +53,8 @@ export default {
 	components:{post},
     data(){
 		return{
+			postData:[],
+			markData:[],
 			tableData:[
 				{'follow':12,'fans':23,'like':'55'}
 			]
