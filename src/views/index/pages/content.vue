@@ -1,7 +1,7 @@
 <template>
     <el-row type="flex" justify="center" :gutter="20">
-        <el-col :xl="12" :lg='16' :md='20' :xs='24' style="padding:5px">
-            <el-image id="cover" style="width:100%;height:300px;border-radius:5px" src="http://pic1.win4000.com/wallpaper/c/57918d798786e.jpg" fit="cover">
+        <el-col :xl="12" :lg='16' :md='20' :xs='24' style="padding:5px" id="contentCard">
+            <el-image id="cover" style="width:100%;height:300px;border-radius:5px" :src="geturl(postData.image)" fit="cover">
                 <div slot="error" class="image-slot" align="center">
                     <i class="el-icon-picture-outline" style="font-size:100px"></i>
                 </div>
@@ -9,18 +9,19 @@
                     <i class="el-icon-loading"></i>
                 </div>
             </el-image>
-            <el-col style="padding:0">
-                <el-col style="padding:0;" :xs="24" :sm="12" :md="10" >
+            <el-col style="padding:0;margin-bottom:5px">
+                <el-col style="padding:0;" :xs="24" :sm="12" :md="10">
                     <el-card style="border-radius:5px;padding:10px">
                         <div slot="header" style="font-weight:bold;color:#757575;">作者</div>
-                        <el-col :span="5" style="margin-top:10px">
-                            <el-avatar src="http://pic1.win4000.com/wallpaper/c/57918d798786e.jpg" :size="60"></el-avatar>
-                        </el-col>
-                        <el-col :span="19" style="margin-top:10px;">
-                            <div style="font-weight:bold;margin-top:5px">任我行</div>
-                            <div style="color:#757575;margin-top:5px">我好想回家啊</div>
-                        </el-col>
-                        <el-col>
+                        <div style="width:60px;float:left">
+                            <!-- <el-avatar :src="geturl(postData.image)" :size="60"></el-avatar> -->
+                            <el-image  :src="geturl(userData.icon)" style="border-radius:50%"></el-image>
+                        </div>
+                        <div style="margin-left:80px">
+                            <div style="font-weight:bold;margin-top:5px">{{userData.nick_name}}</div>
+                            <div style="color:#757575;margin-top:5px">{{userData.motto}}</div>
+                        </div>
+                        <el-col style="clear:both">
                             <el-divider style="margin:0"></el-divider>
                         </el-col>
                         <el-col >
@@ -42,25 +43,28 @@
                 <el-col style="padding:0 0 0 10px;" :xs="24" :sm="12" :md="14">
                     <el-card style="border-radius:5px;padding:10px">
                         <div slot="header" style="font-weight:bold;color:#757575;">该用户的其他文章</div>
-                        <el-col style="padding-top:15px 0 0 0" :md="24" :xs="12" v-for="i in 2" :key="'more'+i">
-                            <el-col :md="4" :xs="8" style="margin-top:10px">
-                                <el-avatar src="http://pic1.win4000.com/wallpaper/c/57918d798786e.jpg" :size="60" shape="square"></el-avatar>
+                        <el-col style="padding-top:15px 0 0 0;cursor:pointer" :md="24" :xs="12" v-for="post in userPostData" :key="'more'+post.id">
+                            <el-col :md="4" :xs="8" style="margin-top:10px" >
+                                <el-avatar :src="geturl(post.image)" :size="60" shape="square"></el-avatar>
                             </el-col>
-                            <el-col :md="20" :xs="16" style="margin-top:10px">
-                                <div style="margin-top:10px; white-space: nowrap;text-overflow: ellipsis;overflow:hidden;font-weight:bold;color:#757575">
-                                    李嘉伟为何又失踪了，他到底隐藏着什么秘密
+                            <el-col :md="20" :xs="16" style="margin-top:10px;color:#757575">
+                                <div style="margin-top:10px; white-space: nowrap;text-overflow: ellipsis;overflow:hidden;font-weight:bold;"
+                                    @click="$router.push(`/content/${post.id}`)">
+                                    {{post.title}}
                                 </div>
-                                <i class="fa fa-heart-o" aria-hidden="true" style="font-size:0.8rem"> 11K</i>
+                                <i class="fa fa-heart-o" aria-hidden="true" style="font-size:0.8rem"> {{post.like_num}}</i>
+                                <i class="fa fa-eye" aria-hidden="true" style="font-size:0.8rem;margin-left:20px"> {{post.view_num}}</i>
                             </el-col>
                         </el-col>
                         <el-col align="center" style="border-top:1px solid #e0e0e0;padding:10px;margin-top:10px;font-weight:bold;color:#757575">查看更多</el-col>
                     </el-card>
                 </el-col>
             </el-col>
+            <el-card>
             <el-col style="margin-top:20px">
-                <div style="font-size:1.4rem;margin-bottom:20px">震惊！李嘉伟不写作业到底在干嘛？ 看完不敢相信...</div>
-                <div style="color:#757575;font-size:0.8rem;margin-bottom:20px" align="right">编辑于 2019-7-04 13：30</div>
-                <div style="color:#757575">
+                <div style="font-size:1.4rem;margin-bottom:20px">{{postData.title}}</div>
+                <div style="color:#757575;font-size:0.8rem;margin-bottom:20px" align="right">编辑于 {{dateFormat(postData.post_time)}}</div>
+                <!-- <div style="color:#757575">
                     任我行说的就是真的啦？你们媒体千万要注意啊，不要“见着风，是得雨”啊。接到这些消息，你媒体本身也要判断，明白意思吗？假使这些完全……无中生有的东西，你再帮他说一遍，你等于，你也等于，你也有责任吧？
                     你…刚才你问我啊，我可以回答你一句“无可奉告”，那你们又不高兴，那怎么办？
                     我讲的意思不是我是说他不写作业。你问我他写没写，他是写了的。我就明确地给你告诉这一点。
@@ -76,7 +80,8 @@
                     你们啊，naïve!
                     I'm angry! 我跟你讲啊，你们这样子啊，是不行的！
                     我今天算是得罪了你们一下！
-                </div>
+                </div> -->
+                <div style="color:#757575" v-html="postData.content"></div>
             </el-col>
             <el-col>
                 <el-divider></el-divider>
@@ -84,36 +89,93 @@
                     <table style="font-weight:bold"  id="infoTable2Content" >
                         <tr>
                             <td style="color:#FF5252">
-                                <i class="fa fa-heart" aria-hidden="true"> 3.3w</i>
+                                <i class="fa fa-heart-o" aria-hidden="true"> {{postData.like_num}}</i>
                             </td>
                             <td style="color:#2196F3">
-                                <i class="fa fa-commenting-o" aria-hidden="true"> 4</i>
+                                <i class="fa fa-commenting-o" aria-hidden="true"> {{postData.reply_num}}</i>
                             </td>
                             <td style="color:#FF9800">
-                                <i class="fa fa-star" aria-hidden="true">10k</i>
+                                <i class="fa fa-star-o" aria-hidden="true"> {{postData.view_num}}</i>
                             </td>
                         </tr>
                     </table>
                 </el-col>
             </el-col>
-            <el-col>
-                <div style="font-size:1.4rem;font-weight:bold;color:#757575;border-left:5px solid #2196F3;padding-left:10px;margin-bottom:20px">文章评论</div>
-                <comment  v-for="i in 4" :key="'comment'+i" />
+            </el-card>
+            <el-col style="padding:0">
+                <div style="font-size:1.4rem;font-weight:bold;color:#757575;border-left:5px solid #2196F3;padding-left:10px;margin:20px 0">文章评论</div>
+                <comment :target="id" style="margin-bottom:20px" />
+                <comments v-for="comment in commentData" :key="'comment'+comment.id" :data="comment"/>
             </el-col>
         </el-col>
     </el-row>
 </template>
 <script>
+import comments from '../components/comments'
 import comment from '../components/comment'
+import { apiHost,imgHost } from '../../../../apiConfig';
 export default {
-    components:{comment},
+    components:{comment,comments},
     data(){
         return{
-            id:this.$route.params.id
+            id:this.$route.params.id,
+            postData:{},
+            userData:{},
+            userPostData:[],
+            commentData:[]
         }
     },
     mounted(){
-        
+        this.getContent();
+        this.getComment();
+    },
+    computed:{
+    },
+    methods:{
+        geturl(url){
+            return imgHost+url;
+        },
+        getContent(){
+            let loading=this.$loading({
+                    fullscreen:false,
+                    target:contentCard,
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading'
+            });
+            this.axios({
+                url:apiHost+'/anon/post/getPostTitleContent?id='+this.id,
+                method:'get'
+            }).then(res=>{
+                if(res!=undefined){
+                    this.postData=res.data.Content;
+                    this.userData=res.data.UserInfo;
+                    this.userPostData=res.data.CurrentPostTitle;
+                }
+                loading.close();
+            })
+        },
+        dateFormat(date){
+			let d=new Date(date);
+			return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getUTCDate()+" "+d.getUTCHours()+":"+d.getMinutes()+":"+d.getSeconds();
+        },
+        getComment(){
+            this.axios({
+                url:apiHost+'/anon/replyInfo/viewReplyInfo?post_title_id='+this.id,
+                method:'get'
+            }).then(res=>{
+                if(res.data.code==200){
+                    console.log(res.data);
+                    this.commentData=res.data.ReplyInfos;
+                }
+            })
+        }
+    },
+    watch:{
+        $route:function(newVal,oldVal){
+            this.id=newVal.params.id;
+            this.getContent();
+        },
     }
 }
 </script>

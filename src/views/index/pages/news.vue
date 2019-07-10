@@ -1,6 +1,6 @@
 <template>
     <el-row type="flex" justify="center" :gutter="20" id="news" >
-        <el-col :lg='18' :md='20' :xs='24'>
+        <el-col :xl="18" :xs='24'>
             <el-container style="padding-top:20px">
 				<el-aside style="padding-right:10px;">
 					<el-card id="leftItemCard">

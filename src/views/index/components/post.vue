@@ -1,18 +1,21 @@
 <template>
-    <el-card id="postCard" :body-style="{padding:'0px'}" style="border-radius:10px;margin:10px 0;">
+    <el-card id="postCard" :body-style="{padding:'0px'}" style="border-radius:10px;margin:10px 0;cursor:pointer">
         <el-image :src="geturl(data.image)"
-            style="width:100%;height:auto;border-radius:10px 10px 0 0;" fit="cover" @click="postClick(12)">
+            style="width:100%;height:auto;border-radius:10px 10px 0 0;" fit="cover" @click="postClick(data.id)">
             <div slot="error" class="image-slot" align="center" style="margin-top:20px">
                 <i class="el-icon-picture-outline" ></i>
             </div>
+            <div slot="placeholder" class="image-slot">
+                <li class="el-icon-loading"></li>
+            </div>
         </el-image>
-        <div style="padding:10px;border-bottom:1px solid #ccc;margin-bottom:10px">{{data.title}}</div>
+        <div style="padding:10px;border-bottom:1px solid #ccc;margin-bottom:10px" @click="postClick(data.id)">{{data.title}}</div>
         <el-row type="flex" align="middle" style="padding:10px;overflow:hidden">
             <el-col :span="3" right>
                 <el-avatar :size="30" :src='geturl(data.icon)'></el-avatar>
             </el-col>
             <el-col :span="10" left>
-                <span>{{data.name}}</span>
+                <span>{{data.nick_name}}</span>
             </el-col>
             <el-col :span="5" left>
                 <i class="fa fa-heart-o" aria-hidden="true"></i>
@@ -26,7 +29,7 @@
     </el-card>
 </template>
 <script>
-import { apiHost } from '../../../../apiConfig';
+import { apiHost,imgHost } from '../../../../apiConfig';
 export default {
     name:'post',
     props:['data'],
@@ -35,7 +38,7 @@ export default {
             this.$router.push(`/content/${id}`);
         },
         geturl(url){
-            return apiHost+url;
+            return imgHost+url;
         }
     },
 }

@@ -1,9 +1,9 @@
 <template>
     <el-row type="flex" justify="center" :gutter="20">
         <el-col :lg='14'  :md='18' :xs='24'>
-            <el-card style="box-shadow:none;border:none">
+            <el-card style="box-shadow:none;border:none;padding:10px">
                 <div align="center" @click="uploadCover()">
-                    <el-image id="cover" style="width:100%;height:200px;border-radius:5px" :src="cover" fit="cover">
+                    <el-image id="cover" style="width:100%;height:200px;border-radius:5px" :src="geturl" fit="cover">
                         <div slot="error" class="image-slot" align="center">
                             <i class="el-icon-picture-outline" style="font-size:100px"></i>
                         </div>
@@ -23,7 +23,6 @@
                 <div align="end" style="margin-top:20px;" id="submitBtn">
                     <el-button style="border-radius:5px 0 0 5px;" type="primary" @click="submit()">发布到</el-button>
                     <el-cascader clearable placeholder="请选择分区"
-                            v-model="plateName"
                             :options="plates"
                             @change="selectPlate"  :props="{ expandTrigger: 'hover' }"></el-cascader>
                 </div>
@@ -33,30 +32,26 @@
 </template>
 <script>
 import wangeditor from 'wangeditor'
-import {imgHost} from '../../../../apiConfig.js'
+import {imgHost, apiHost} from '../../../../apiConfig.js'
 export default {
     data(){
         return{
-            //plates:['时尚','美食','旅行','体育','影视'],
-            plates:[
-                {'value':'1','label':'时尚',
-                    'children':[
-                        {'value':'1-1','label':'美妆'},
-                        {'value':'1-2','label':'穿搭'}]},
-                {'value':'2','label':'美食',
-                    'children':[
-                        {'value':'2-1','label':'美妆'},
-                        {'value':'2-2','label':'穿搭'}]}
-            ],
-            plateName:'请选择分区',
+            plates:[],
+            districtId:-1,
             editor:null,
-            cover:imgHost+'/default.jpg',
+            cover:'/default.jpg',
             title:'',
+        }
+    },
+    computed:{
+        geturl(){
+            return imgHost+this.cover;
         }
     },
     methods:{
         selectPlate(value){
-            this.plateName=value;
+            let temp=value[1].split('-');
+            this.districtId=temp[1];
         },
         initEditor(){
             const editor=new wangeditor(this.$refs.toolbar,this.$refs.text);
@@ -93,7 +88,8 @@ export default {
 
 				_this.axios({
 					method:'post',
-					url: imgHost+'/img/upload',
+                    url: imgHost+'/img/upload',
+                    // withCredentials: false,
 					data:formData,
 				}).then(function(res){
 					if(res.data.code==200){
@@ -124,7 +120,7 @@ export default {
                         data:data
                     }).then(res=>{
                         if(res.data.code==200){
-                            _this.cover=imgHost+res.data.path;
+                            _this.cover=res.data.path;
                         }
                     })
                 }
@@ -133,11 +129,69 @@ export default {
         },
         submit(){
             let content=this.editor.txt.html();
-            console.log(content);
+            let content_txt=this.editor.txt.text();
+            if(this.title.trim().length==0){
+                this.$message('标题不能为空');
+                return;
+            }
+            if(content_txt.trim().length==0){
+                this.$message('内容不能为空');
+                return;
+            }
+            if(this.districtId==-1){
+                this.$message('请选择分区');
+                return;
+            }
+            if(this.cover==""){
+                this.cover='/default.jpg'
+            }
+            let id=localStorage['userId'];
+            console.log(id)
+            this.axios({
+                url:apiHost+'/anon/post/addPostTitle',
+                method:'post',
+                data:{'title':this.title,'content':content,'districtInfo_id':this.districtId,'image':this.cover,'owner':id}
+            }).then(res=>{
+                if(res.data.code==200){
+                    this.editor.txt.clear();
+                    this.title="";
+                    this.cover="";
+                    this.$notify({
+                        title: '发布成功',
+                        type: 'success',
+                        duration: 2000
+                    });
+                }else{
+                    this.$notify({
+                        title: '发布失败',
+                        message:res.msg,
+                        type: 'error'
+                    });
+                }
+            })
+        },
+        getPlates(){
+            this.axios({
+                url:apiHost+"/anon/plate/getPlates",
+                method:"get"
+            }).then(res=>{
+                if(res!=undefined){
+                    console.log(this.plates);
+                    this.plates=res.data.map(plate=>{
+                        let children=plate.districtInfos.map(district=>{
+                            //父级value与子级value不能相同，所以给子级value前加上'父级id-',导致获取子级id时需要分割字符串
+                            return {'value':district.plate_id+'-'+district.id,'label':district.district_name};
+                        })
+                        return {'value':plate.id,'label':plate.plate_name,'children':children}
+                    })
+                    console.log(this.plates)
+                }
+            })
         }
     },
     mounted(){
         this.initEditor();
+        this.getPlates();
     }
 }
 </script>

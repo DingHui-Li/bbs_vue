@@ -48,7 +48,11 @@ Vue.use(VueRouter);
 Vue.use(VueAwesomeSwiper);
 Vue.use(vueAxios,axios);
 axios.defaults.withCredentials=true;
-axios.interceptors.request.use(request=>{return request;},error=>{
+axios.interceptors.request.use(request=>{
+	if(request.url=="http://lidh.top:8084/imgservice/img/upload"){
+		request.withCredentials=false;
+	}
+	return request;},error=>{
 	alert(error)
 })
 axios.interceptors.response.use(response=>{return response;},error=>{

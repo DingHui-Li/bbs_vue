@@ -1,32 +1,78 @@
 <template>
-	<el-col style="padding-right:0;">
-		<el-col :sm="1" :xs="2" style="padding:0">
-			<el-avatar src="http://pic1.win4000.com/wallpaper/c/57918d798786e.jpg" :size="35"></el-avatar>
-		</el-col>
-		<el-col :sm="23" :xs="22">
-			<el-col :sm="21" :xs="18">
-				<div>Y.</div>
-				<div style="font-size:0.8rem;color:#757575;margin:5px 0">昨天 15：40</div>
-				<div>阿三大苏打实打实的请问请问大师餐桌上的啊</div>
-			</el-col>
-			<el-col :sm="3" :xs="5" style="color:#757575;font-size:0.9rem">
-				回复|删除
-			</el-col>
-			<el-col>
-				<div style="background-color:#f9f9f9;border-radius:10px;padding:10px">s</div>
-			</el-col>
-		</el-col>
-		<el-col>
-			<el-divider></el-divider>
-		</el-col>
-	</el-col>
+    <el-card style="padding:10px;box-shadow:none" id="comment">
+        <el-input type="textarea"  :autosize="{ minRows: 1, maxRows: 4}" placeholder="请输入内容" v-model="msgTxt"></el-input>
+        <div align="right" style="margin-top:20px">
+            <el-button type="primary" @click="submit()">发表</el-button>
+        </div>
+    </el-card>
 </template>
 <script>
+import wangeditor from 'wangeditor'
+import { apiHost } from '../../../../apiConfig';
 export default {
-	name:'comment'
+    props:['target'],
+    data(){
+        return{
+            msgTxt:"",
+            editor:null,
+            islogin:false,
+            userid:-1
+        }
+    },
+    mounted(){
+        this.checkSession();
+    },
+    methods:{
+        submit(){
+            if(this.islogin){
+                if(this.msgTxt.trim().length==0){
+                    this.$message.error('不能为空')
+                    return;
+                }
+                const loading = this.$loading({
+                    lock: true,
+                    target:comment,
+                    text: '回复中...',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.7)'
+                });
+                this.axios({
+                    url:apiHost+"/replyInfo/addReplyInfo",
+                    method:'post',
+                    data:{'post_title_id':this.target,'user_id':this.userid,'content':this.msgTxt}
+                }).then(res=>{
+                    if(res.data.code==200){
+                        this.$notify({
+                            title:'成功',
+                            type:'success'
+                        });
+                        this.msgTxt="";
+                    }else{
+                        this.$notify.error({
+                            title:'失败'
+                        })
+                    }
+                    loading.close();
+                })
+            }else{
+                this.$message.error('未登录')
+            }
+        },
+        checkSession(){
+            this.axios({
+                url:apiHost+'/checkSession',
+                method:'post',
+            }).then(res=>{
+                if(res.data.code==200) {
+                    this.islogin=true;
+                    this.userid=res.data.id;
+                }
+                else this.islogin=false;
+            })
+        }
+    }
 }
 </script>
 <style>
 
 </style>
-

@@ -20,13 +20,17 @@
                         <el-menu-item index="/news/system" align="center" @click="$router.replace(`/news/${'system'}`)">系统通知<el-badge :value="1" style="margin-left:5px"></el-badge></el-menu-item>
                         <el-menu-item index="news/msg" align="center" @click="$router.replace(`/news/${'msg'}`)">短消息<el-badge :value="1" style="margin-left:5px"></el-badge></el-menu-item>
                     </el-submenu>
-                    <el-submenu index="6" class="hidden-sm-and-down">
+                    <el-submenu index="6" class="hidden-sm-and-down" v-if="islogin">
                         <template slot="title">
-                            <img :src="icon" style="width:40px;height:40px;border-radius:50%" @click="login()">
+                            <img :src="icon" style="width:40px;height:40px;border-radius:50%">
                         </template>       
                         <el-menu-item index="/person" align="center" @click="$router.replace('/person')">个人主页</el-menu-item>    
-                        <el-menu-item index="6-2" align="center">登出</el-menu-item>       
+                        <el-menu-item index="6-2" align="center" @click="logout()">登出</el-menu-item>       
                     </el-submenu>
+                    <el-menu-item v-else>
+                        <i class="fa fa-user" aria-hidden="true" @click="login()" style="font-size:1.3rem"></i>
+                        <span style="font-size:0.8rem" @click="login()"> 未登录</span>
+                    </el-menu-item>
                 </el-menu>
                 <transition name="el-fade-in-linea">
                     <div style="width:100vw;height:100vh;position:fixed;z-index:999;background-color:rgba(0,0,0,.3)" v-if="sideNav" @click="sideNav=false">
@@ -45,7 +49,7 @@
     </el-container>
 </template>
 <script>
-import {apiHost} from '../../../../apiConfig.js'
+import {apiHost,imgHost} from '../../../../apiConfig.js'
 import search from '../components/search'
 export default {
     name:'toolbar',
@@ -60,18 +64,23 @@ export default {
             sideNav:false,
             active:'/home',
             state:'',
-            userInfo:{}
+            userInfo:{},
+            islogin:false
         }
     },
     computed:{
         icon(){
             if(localStorage['userIcon']!=undefined)
-                return apiHost+localStorage['userIcon'];
+                return imgHost+localStorage['userIcon'];
+            if(this.userInfo!={}){
+                return imgHost+this.userInfo.icon;
+            }
         }
     },
     mounted:function(){
         this.active=this.$route.path;
         this.center();
+        this.checkSession();
     },
     methods:{
         test(){
@@ -87,6 +96,16 @@ export default {
         login:function(){
             this.$router.replace("/login");
         },
+        logout(){
+            this.axios({
+                url:apiHost+'/logout',
+                method:'get'
+            }).then(res=>{
+                if(res.data.code==200){
+                    this.checkSession();
+                }
+            })
+        },
         center(){
             let ele=document.getElementById("menu");
             let width=ele.offsetLeft;
@@ -96,9 +115,22 @@ export default {
             this.userInfo=info;
             localStorage['userIcon']=info.icon;
             localStorage['userId']=info.id;
+        },
+        checkSession(){
+            this.axios({
+                url:apiHost+'/checkSession',
+                method:'post',
+            }).then(res=>{
+                console.log(res.data.msg)
+                if(res.data.code==200) this.islogin=true;
+                else this.islogin=false;
+            })
         }
     },
     watch:{
+        $route:function(to,form){
+            this.checkSession();
+        }
     }
 }
 </script>

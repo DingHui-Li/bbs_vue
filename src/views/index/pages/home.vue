@@ -2,9 +2,14 @@
     <el-row type="flex" justify="center" :gutter="20" class="animated fadeIn">
         <el-col :lg='18' :md='20' :xs='24' style="padding:0">
             <el-card style="padding:0;box-shadow:none;border:none;min-height:100vh" id="tabCard">
-                <el-tabs stretch style="color:#000;box-shadow:none;border:none;padding:0" type="border-card" >
+                <el-tabs stretch style="color:#000;box-shadow:none;border:none;padding:0" type="border-card" :value="'发现'" @tab-click="plateChange">
+                    <el-tab-pane label="发现" :name="'发现'">
+                        <el-col :xl="6" :lg="8" :sm="12" :xs="24" v-for="post in homeData" :key="'homepost'+post.id">
+                            <post :data='post'></post>
+                        </el-col>
+                    </el-tab-pane>
                     <el-tab-pane v-for="(plate,index) in plates" :key="'tab_'+plate.plate_name" :label="plate.plate_name" :name="index+''">
-                        <el-tabs stretch style="padding:0" @tab-click="handleClick">
+                        <el-tabs stretch style="padding:0;min-height:50vh" @tab-click="handleClick" v-model="actDistrict" id="district_pane">
                             <el-tab-pane v-for="(district) in plate.districtInfos" :key="'tab_'+district.district_name" :label="district.district_name" :name="district.id+''">
                                 <notice />
                                 <el-col style="margin:20px 0" align="end">
@@ -36,27 +41,22 @@ export default {
     data(){
         return{
             sort:'最新发布',
+            homeData:[],
             plates:[],
-            posts:[]
+            posts:[],
+            actDistrict:'0'
         }   
     },
     mounted(){
-        this.getPlate()
+        this.getPlate();
+        this.getHomeData();
     },
     computed:{
-        loading(){
-            return this.$loading({
-                    fullscreen:false,
-                    target:tabCard,
-                    lock: true,
-                    text: 'Loading',
-                    spinner: 'el-icon-loading'
-            });
-        }
+
     },
     methods:{
         getPlate(){
-            const loading=this.loading;
+            const loading=this.loading('tabCard');
             this.axios({
                 url:apiHost+"/anon/plate/getPlates",
                 method:"get"
@@ -67,14 +67,53 @@ export default {
                 loading.close();
             })
         },
+        plateChange(tab,event){
+            if(tab.name!='发现'){
+                this.actDistrict=this.plates[tab.name].districtInfos[0].id+'';
+            }
+        },
         handleClick(tab, event) {
+            let loading=this.loading('district_pane');
             this.axios({
                 url:apiHost+"/anon/post/getPostTitles?id="+tab.name,
                 method:'get'
             }).then(res=>{
                 this.posts=res.data;
                 console.log(res);
+                loading.close();
             })
+        },
+        getHomeData(){
+            this.axios({
+                url:apiHost+'/anon/post/getIndexPostTitles',
+                method:'get'
+            }).then(res=>{
+                if(res.data.code==200){
+                    this.homeData=res.data.PostTitleList;
+                }
+            })
+        },
+        loading(target){
+            return this.$loading({
+                    fullscreen:false,
+                    target:document.getElementById(target),
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading'
+            });
+        }
+    },
+    watch:{
+        actDistrict:function(newVal,oldVal){
+            if(newVal!=oldVal){
+                this.axios({
+                    url:apiHost+"/anon/post/getPostTitles?id="+newVal,
+                    method:'get'
+                }).then(res=>{
+                    this.posts=res.data;
+                    console.log(res);
+                })                    
+            }
         }
     }
 }
