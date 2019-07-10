@@ -1,4 +1,5 @@
 <template>
+    <!-- 发表评论的组件 -->
     <el-card style="padding:10px;box-shadow:none" id="comment">
         <el-input type="textarea"  :autosize="{ minRows: 1, maxRows: 4}" placeholder="请输入内容" v-model="msgTxt"></el-input>
         <div align="right" style="margin-top:20px">

@@ -1,4 +1,5 @@
 <template>
+	<!-- 展示评论的组件 -->
 	<el-card style="padding:20px;box-shadow:none">
 		<el-col :sm="1" :xs="2" style="padding:0">
 			<el-avatar src="http://pic1.win4000.com/wallpaper/c/57918d798786e.jpg" :size="35"></el-avatar>

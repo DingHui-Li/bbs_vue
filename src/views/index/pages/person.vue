@@ -34,12 +34,12 @@
 			</el-card>
 			<el-tabs stretch>
 				<el-tab-pane label="帖子">
-					<el-col :sm="12" :xs="24" v-for="i in 9" :key="i" v-if="postData.length>0">
+					<el-col :sm="12" :xs="24" v-for="i in 9" :key="'post'+i">
 						<post></post>
 					</el-col>
 				</el-tab-pane>
 				<el-tab-pane label="收藏">
-					<el-col :sm="12" :xs="24" v-for="i in 9" :key="i"  v-if="markData.length>0">
+					<el-col :sm="12" :xs="24" v-for="i in 9" :key="'mark'+i">
 						<post></post>
 					</el-col>
 				</el-tab-pane>

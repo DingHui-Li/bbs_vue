@@ -1,5 +1,5 @@
 <template>
-    <el-row type="flex" justify="center" :gutter="20" id="news" >
+    <el-row type="flex" justify="center" :gutter="20" id="news" style="position:fixed;width:100%" >
         <el-col :xl="18" :xs='24'>
             <el-container style="padding-top:20px">
 				<el-aside style="padding-right:10px;">
@@ -9,21 +9,26 @@
 							<span style="font-weight:bold;color:#757575"> 消息中心</span> 
 						</div>
 						<el-menu align="center">
-							<el-menu-item  v-for="item in leftItem" :key="item.name" :index="item.name" >
+							<el-menu-item  v-for="(item,index) in leftItem" :key="item.name" :index="item.name" @click="select=index">
 								<i class="fa fa-circle" aria-hidden="true" style="font-size:0.5rem;color:#757575"></i>
 								<span class="leftItem" style="margin-right:10px;color:#757575"> {{item.name}}</span> 
-								<el-badge style="margin-left:5px" :value="item.count" :hidden="!(item.count>0)"></el-badge>
+								<el-badge style="margin-left:5px" :value="item.count" :hidden="!(item.count>0)||badgeType=='hidden'" :is-dot="badgeType=='dot'"></el-badge>
 							</el-menu-item>
 						</el-menu>
 						<el-divider></el-divider>
-						<div align="center" style="cursor:pointer;padding-bottom:20px">
+						<div align="center" style="cursor:pointer;padding-bottom:20px" @click="select=5">
 							<i class="fa fa-cog" aria-hidden="true" style="color:#757575"></i>
 							<span> 消息设置</span>
 						</div>
 					</el-card>
 				</el-aside>
 				<el-main style="padding:0;">
-					<focus />
+					<focus v-if="select==0" class="animated slideInLeft" style="animation-duration:0.5s"/>
+					<comment2me v-else-if="select==1" class="animated slideInLeft" style="animation-duration:0.5s"/>
+					<like v-else-if="select==2" class="animated slideInLeft" style="animation-duration:0.5s"/>
+					<systemNotic v-else-if="select==3" class="animated slideInLeft" style="animation-duration:0.5s"/>
+					<myMsg v-else-if="select==4" class="animated slideInLeft" style="animation-duration:0.5s"/>
+					<newsSet v-else-if="select==5" class="animated slideInLeft" style="animation-duration:0.5s" @changeBadgeType="changeBadgeType"/>
 				</el-main>
 				<el-aside style="padding-left:10px;cursor:pointer;">
 					<el-card style="padding:0;" id="rightItemCard">
@@ -48,10 +53,10 @@
 							</table>
 						</div>
 					</el-card>
-					<el-card style="margin-top:20px" id="friendCard">
+					<el-card style="margin-top:10px" id="friendCard">
 						<div slot="header" style="color:#757575">我的好友(20)</div>
 						<el-scrollbar>
-							<div style="padding:10px 20px" v-for="i in 20" :key="i">
+							<div style="padding:10px 20px;background-color:#fff" v-for="i in 20" :key="i" id="friendItem">
 								<div style="width:40px;float:left">
 									<el-avatar src="http://static.simpledesktops.com/uploads/desktops/2014/04/24/highPoint_2880x1800.png" :size="40"></el-avatar>
 								</div>
@@ -69,8 +74,13 @@
 </template>
 <script>
 import focus from '../components/focus'
+import comment2me from '../components/comment2me'
+import like from '../components/like'
+import systemNotic from '../components/systemNotic'
+import newsSet from '../components/newsSet'
+import myMsg from '../components/myMsg'
 export default {
-	components:{focus},
+	components:{focus,comment2me,like,systemNotic,newsSet,myMsg},
     data(){
 		return{
 			type:this.$route.params.type,
@@ -80,11 +90,18 @@ export default {
 				{'name':"收到的赞",'count':'2'},
 				{'name':"系统通知",'count':'3'},
 				{'name':"我的消息",'count':'4'},
-			]
+			],
+			select:1,
+			badgeType:'num'
 		}
 	},
 	mounted(){
 		
+	},
+	methods:{
+		changeBadgeType(type){
+			this.badgeType=type;
+		}
 	}
 }
 </script>
@@ -102,5 +119,8 @@ export default {
 	}
 	#friendCard .el-scrollbar{
 		height:400px
+	}
+	#friendItem:hover{
+		filter: brightness(0.9)
 	}
 </style>

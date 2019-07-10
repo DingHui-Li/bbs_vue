@@ -119,7 +119,7 @@ export default {
 }
 </script>
 <style>
-    .el-card__body{
+    /* .el-card__body{
         padding:0
-    }
+    } */
 </style>
