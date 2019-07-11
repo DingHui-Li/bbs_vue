@@ -35,8 +35,9 @@ const routes=[{path:'/',component:toolbar,children:[
 					{path:'plate',component:plate},
 					{path:'notice',component:notice},
 					{path:'login',component:login},	
-					{path:'person',component:person},
+					{path:'person/:id',component:person},
 					{path:'publish',component:publish},
+					{path:'publish/:id',redirect:'publish'},
 					{path:'content/:id',component:content},
 					{path:'news/:type',component:news},
 				]},]

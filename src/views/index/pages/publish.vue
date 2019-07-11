@@ -1,7 +1,7 @@
 <template>
     <el-row type="flex" justify="center" :gutter="20">
         <el-col :lg='14'  :md='18' :xs='24'>
-            <el-card style="box-shadow:none;border:none;padding:10px">
+            <el-card style="box-shadow:none;border:none;padding:10px" id="publishCard">
                 <div align="center" @click="uploadCover()">
                     <el-image id="cover" style="width:100%;height:200px;border-radius:5px" :src="geturl" fit="cover">
                         <div slot="error" class="image-slot" align="center">
@@ -41,6 +41,7 @@ export default {
             editor:null,
             cover:'/default.jpg',
             title:'',
+            id:this.$route.params.id,
         }
     },
     computed:{
@@ -85,7 +86,6 @@ export default {
 				let formData =new FormData();
 				formData.append("file",file[0]);
 				formData.append("type","img")
-
 				_this.axios({
 					method:'post',
                     url: imgHost+'/img/upload',
@@ -146,7 +146,16 @@ export default {
                 this.cover='/default.jpg'
             }
             let id=localStorage['userId'];
-            console.log(id)
+            if(id==undefined){
+                return;
+            } 
+            const loading = this.$loading({
+                lock: true,
+                target:document.getElementById('publishCard'),
+                text: '发帖中...',
+                spinner: 'el-icon-loading',
+                background: 'rgba(0, 0, 0, 0.7)'
+            });
             this.axios({
                 url:apiHost+'/anon/post/addPostTitle',
                 method:'post',
@@ -168,6 +177,7 @@ export default {
                         type: 'error'
                     });
                 }
+                loading.close();
             })
         },
         getPlates(){

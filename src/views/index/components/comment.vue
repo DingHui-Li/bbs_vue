@@ -48,6 +48,7 @@ export default {
                             type:'success'
                         });
                         this.msgTxt="";
+                        this.$emit('updateComment')
                     }else{
                         this.$notify.error({
                             title:'失败'

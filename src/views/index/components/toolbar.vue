@@ -24,7 +24,7 @@
                         <template slot="title">
                             <img :src="icon" style="width:40px;height:40px;border-radius:50%">
                         </template>       
-                        <el-menu-item index="/person" align="center" @click="$router.replace('/person')">个人主页</el-menu-item>    
+                        <el-menu-item index="/person" align="center" @click="goPerson()">个人主页</el-menu-item>    
                         <el-menu-item index="6-2" align="center" @click="logout()">登出</el-menu-item>       
                     </el-submenu>
                     <el-menu-item v-else>
@@ -105,6 +105,11 @@ export default {
                     this.checkSession();
                 }
             })
+        },
+        goPerson(){
+            let id=localStorage['userId'];
+            if(id!=undefined)
+                this.$router.replace(`/person/${id}`)
         },
         center(){
             let ele=document.getElementById("menu");

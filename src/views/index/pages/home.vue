@@ -1,7 +1,7 @@
 <template>
     <el-row type="flex" justify="center" :gutter="20" class="animated fadeIn">
         <el-col :lg='18' :md='20' :xs='24' style="padding:0">
-            <el-card style="padding:0;box-shadow:none;border:none;min-height:100vh" id="tabCard">
+            <el-card style="padding:0;box-shadow:none;border:none;min-height:100vh" id="homeCard">
                 <el-tabs stretch style="color:#000;box-shadow:none;border:none;padding:0" type="border-card" :value="'发现'" @tab-click="plateChange">
                     <el-tab-pane label="发现" :name="'发现'">
                         <el-col :xl="6" :lg="8" :sm="12" :xs="24" v-for="post in homeData" :key="'homepost'+post.id">
@@ -88,6 +88,7 @@ export default {
                 url:apiHost+'/anon/post/getIndexPostTitles',
                 method:'get'
             }).then(res=>{
+                console.log(res)
                 if(res.data.code==200){
                     this.homeData=res.data.PostTitleList;
                 }
@@ -119,7 +120,7 @@ export default {
 }
 </script>
 <style>
-    /* .el-card__body{
+    #homeCard .el-card__body{
         padding:0
-    } */
+    }
 </style>
