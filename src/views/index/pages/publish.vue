@@ -24,6 +24,7 @@
                     <el-button style="border-radius:5px 0 0 5px;" type="primary" @click="submit()">发布到</el-button>
                     <el-cascader clearable placeholder="请选择分区"
                             :options="plates"
+                            v-model="selectedPlate"
                             @change="selectPlate"  :props="{ expandTrigger: 'hover' }"></el-cascader>
                 </div>
             </el-card>
@@ -38,10 +39,11 @@ export default {
         return{
             plates:[],
             districtId:-1,
+            selectedPlate:['1','2-1'],
             editor:null,
             cover:'/default.jpg',
             title:'',
-            id:this.$route.params.id,
+            id:this.$route.params.id,//帖子id
         }
     },
     computed:{
@@ -186,7 +188,6 @@ export default {
                 method:"get"
             }).then(res=>{
                 if(res!=undefined){
-                    console.log(this.plates);
                     this.plates=res.data.map(plate=>{
                         let children=plate.districtInfos.map(district=>{
                             //父级value与子级value不能相同，所以给子级value前加上'父级id-',导致获取子级id时需要分割字符串
@@ -194,14 +195,39 @@ export default {
                         })
                         return {'value':plate.id,'label':plate.plate_name,'children':children}
                     })
-                    console.log(this.plates)
                 }
+            })
+        },
+        getData(){
+            let loading=this.$loading({
+                    fullscreen:false,
+                    target:publishCard,
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading'
+            });
+            this.axios({
+                url:apiHost+'/anon/post/getPostTitleContent?id='+this.id,
+                method:'get'
+            }).then(res=>{
+                loading.close();
+                if(res.data.code==200){
+                    this.title=res.data.Content.title;
+                    this.cover=res.data.Content.image;
+                    this.editor.txt.html(res.data.Content.content);
+                    this.selectedPlate.push('1');
+                    this.selectedPlate.push('1-2');
+                }
+                console.log(res)
             })
         }
     },
     mounted(){
         this.initEditor();
         this.getPlates();
+        if(this.id!=undefined){
+            this.getData();
+        }
     }
 }
 </script>

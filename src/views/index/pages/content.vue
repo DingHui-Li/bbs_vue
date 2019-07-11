@@ -121,7 +121,7 @@ export default {
     components:{comment,comments},
     data(){
         return{
-            id:this.$route.params.id,
+            id:this.$route.params.id,//帖子id
             postData:{},
             userData:{},
             userPostData:[],
@@ -196,7 +196,7 @@ export default {
                     }
                 }
             })
-        }
+        },
     },
     watch:{
         $route:function(newVal,oldVal){
