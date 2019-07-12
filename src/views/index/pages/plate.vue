@@ -1,14 +1,24 @@
 <template>
     <el-row type="flex" justify="center" :gutter="20">
-        <el-col :lg='18' :md='20' :xs='24' style="padding:20px;background-color:#fff" id="plate">
+        <el-col :lg='18' :md='20' :xs='24' style="padding:20px;background-color:#fff;" id="plate">
             <el-collapse  accordion style="padding:20px;">
-                <el-collapse-item v-for="plate in plates" :key="'plate'+plate.name" :name="plate.name" :title="plate.name+'(4)'">
-                    <div v-for="dist in plate.district" :key="dist.name" > 
+                <el-collapse-item v-for="plate in plates" :key="'plate'+plate.id" :name="plate.plate_name">
+                    <template slot="title">
+                        <span>{{plate.plate_name}}</span>
+                        <span style="font-size:0.9rem;color:#757575;">
+                            <span style="font-weight:bold"> ({{plate.districtInfos.length}}</span>
+                            <span>个分区;</span>
+                        </span>
+                        <span style="font-size:0.9rem;color:#757575">
+                            共<span style="font-weight:bold">{{plate.post_num}}</span>个帖子)
+                        </span>
+                    </template>
+                    <div v-for="dist in plate.districtInfos" :key="dist.name" > 
                         <el-col :md="8" :xs="24" style="padding:10px">
                             <el-card style="border-radius:10px;background-color:#607D8B;color:#fff">
-                                <div slot="header" align="center" style="font-size:2rem"> {{dist.name}}</div>
+                                <div slot="header" align="center" style="font-size:2rem"> {{dist.district_name}}</div>
                                 <div style="font-size:1rem">
-                                    帖子: <span>23</span>
+                                    帖子: <span>{{dist.post_num}}</span>
                                 </div>
                                 <div style="font-size:1rem">
                                     最新帖子：<span>2019-7-11 12:2:32</span>
@@ -22,31 +32,46 @@
     </el-row>
 </template>
 <script>
+import { apiHost } from '../../../../apiConfig';
 export default {
     data(){
         return{
-            plates:[
-                {'name':'美食','district':[
-                    {'name':'中餐'},
-                    {'name':'中餐'},
-                    {'name':'中餐'},
-                    {'name':'中餐'},
-                    {'name':'中餐'},
-                    ]},
-                {'name':'游戏','district':[{
-                    'name':'中餐'
-                }]},
-                {'name':'影视','district':[{
-                    'name':'中餐'
-                }]},
-                {'name':'时尚','district':[{
-                    'name':'中餐'
-                }]}
-            ]
+            // plates:[
+            //     {'name':'美食','district':[
+            //         {'name':'中餐'},
+            //         {'name':'中餐'},
+            //         {'name':'中餐'},
+            //         {'name':'中餐'},
+            //         {'name':'中餐'},
+            //         ]},
+            //     {'name':'游戏','district':[{
+            //         'name':'中餐'
+            //     }]},
+            //     {'name':'影视','district':[{
+            //         'name':'中餐'
+            //     }]},
+            //     {'name':'时尚','district':[{
+            //         'name':'中餐'
+            //     }]}
+            // ]
+            plates:[],
         }
     },
     mounted(){
-    
+        this.getPlate();
+    },
+    methods:{
+        getPlate(){
+            this.axios({
+                url:apiHost+"/anon/plate/getPlates",
+                method:"get"
+            }).then(res=>{
+                if(res!=undefined){
+                    this.plates=res.data;
+                }
+                console.log(this.plates)
+            })
+        },
     }
 }
 </script>

@@ -95,12 +95,20 @@
 </template>
 <script>
 import post from "../components/post"
+import { apiHost } from '../../../../apiConfig';
 export default {
     components:{post},
     data(){
         return{
             postData:[]
         }
+    },
+    methods:{
+        // getData(){
+        //     this.axios({
+        //         url:apiHost+'/'
+        //     })
+        // }
     }
 }
 </script>

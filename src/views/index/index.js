@@ -6,15 +6,12 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import 'element-ui/lib/theme-chalk/display.css';
 
-import VueAwesomeSwiper from 'vue-awesome-swiper'
-import 'swiper/dist/css/swiper.css'
-
 import vueAxios from 'vue-axios'
 import axios from 'axios'
 
 import animated from 'animate.css'
 
-
+import {apiHost} from '../../../apiConfig'
 // ===============================================
 const toolbar=()=>import('./components/toolbar')
 
@@ -43,10 +40,22 @@ const routes=[{path:'/',component:toolbar,children:[
 				]},]
 const router=new VueRouter({routes})
 
+// router.beforeEach((to,form,next)=>{
+// 	if(to.path.indexOf('publish')!=-1){
+// 		axios({
+// 			url:apiHost+'/checkSession',
+// 			method:'post',
+// 		}).then(res=>{
+// 			if(res.data.code==200) {
+// 			}
+// 			console.log(res)
+// 		})
+// 	}
+// 	return next;
+// })
 //============================================================
 Vue.use(ElementUI);
 Vue.use(VueRouter);
-Vue.use(VueAwesomeSwiper);
 Vue.use(vueAxios,axios);
 axios.defaults.withCredentials=true;
 axios.interceptors.request.use(request=>{
@@ -56,7 +65,12 @@ axios.interceptors.request.use(request=>{
 	return request;},error=>{
 	alert(error)
 })
-axios.interceptors.response.use(response=>{return response;},error=>{
+axios.interceptors.response.use(response=>{
+	if(response.data.code==500){
+		if(response.config.url.indexOf('checkSession')==-1)
+			alert(response.data.msg);
+	}
+	return response;},error=>{
 	alert(error)
 })
 new Vue({

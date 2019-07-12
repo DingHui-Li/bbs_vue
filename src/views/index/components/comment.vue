@@ -40,7 +40,7 @@ export default {
                 this.axios({
                     url:apiHost+"/replyInfo/addReplyInfo",
                     method:'post',
-                    data:{'post_title_id':this.target,'user_id':this.userid,'content':this.msgTxt}
+                    data:{'post_title_id':this.target,'content':this.msgTxt}
                 }).then(res=>{
                     if(res.data.code==200){
                         this.$notify({

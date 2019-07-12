@@ -1,6 +1,6 @@
 <template>
     <!-- 个人中心页的帖子组件 -->
-    <el-card id="postCard" :body-style="{padding:'0px'}" style="border-radius:10px;margin:10px 0;cursor:pointer;box-shadow:none">
+    <el-card :id="'ezpost'+data.id" :body-style="{padding:'0px'}" style="border-radius:10px;margin:10px 0;cursor:pointer;box-shadow:none">
         <el-image :src="geturl(data.image)"
             style="width:150px;height:150px;float:left" fit="cover" @click="postClick(data.id)">
             <div slot="error" class="image-slot" align="center" style="margin-top:20px">
@@ -29,7 +29,9 @@
                         <i class="fa fa-commenting-o" aria-hidden="true"> {{data.reply_num}}</i>
                     </td>
                     <td style="color:#FF9800">
-                        <i class="fa fa-star-o" aria-hidden="true"> 0</i>
+                        <i class="fa fa-star" aria-hidden="true" v-if="data.collected" @click="mark"></i>
+                        <i class="fa fa-star-o" aria-hidden="true" v-else @click="mark"></i>
+                        <span> {{data.recommend_num}}</span>
                     </td>
                     <td style="color:#8BC34A">
                         <i class="fa fa-eye" aria-hidden="true"> {{data.view_num}}</i>
@@ -91,7 +93,7 @@ export default {
         like(){
             const loading = this.$loading({
                 lock: true,
-                target:document.getElementById('post'+this.data.id),
+                target:document.getElementById('ezpost'+this.data.id),
                 text: 'loading...',
                 spinner: 'el-icon-loading',
                 background: 'rgba(0, 0, 0, 0.7)'
@@ -111,7 +113,32 @@ export default {
                     }
                 }
             })
-        }
+        },
+        mark(){
+            const loading = this.$loading({
+                lock: true,
+                target:document.getElementById('ezpost'+this.data.id),
+                text: '操作中...',
+                spinner: 'el-icon-loading',
+                background: 'rgba(0, 0, 0, 0.7)'
+            });
+            this.axios({
+                url:apiHost+'/anon/post/collect?post_title_id='+this.data.id,
+                method:'get'
+            }).then(res=>{
+                loading.close();
+                console.log(res)
+                if(res.data.code==200){
+                    if(this.data.collected){
+                        this.data.recommend_num-=1;
+                        this.data.collected=false;
+                    }else{
+                        this.data.recommend_num+=1;
+                        this.data.collected=true;
+                    }
+                }
+            })
+        },
     },
 }
 </script>

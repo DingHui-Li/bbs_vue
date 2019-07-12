@@ -12,7 +12,33 @@
         </el-image>
         <!-- 标题 -->
         <div style="padding:10px;border-bottom:1px solid #ccc;margin-bottom:10px" @click="postClick(data.id)">{{data.title}}</div>
-        <el-row type="flex" align="middle" style="padding:10px;overflow:hidden">
+        <div style="padding:10px">
+            <div style="float:left;width:30px;">
+                <el-image style="width:30px;border-radius:50%;height:30px" :src='geturl(data.icon)' @click="$router.push(`/person/${data.owner}`)"></el-image>
+            </div>
+            <span @click="$router.push(`/person/${data.owner}`)" style="font-weight:bold;color:#757575;margin-top:5px;line-height:30px">{{data.nick_name}}</span>
+            <table style="font-weight:bold;font-size:0.9rem"  id="infoTable2Content" align="right">
+                    <tr>
+                        <td style="color:#FF5252">
+                            <i class="fa fa-heart" aria-hidden="true" v-if="data.liked" @click='like()'></i>
+                            <i class="fa fa-heart-o" aria-hidden="true" v-else @click='like()'></i>
+                            <span> {{data.like_num}}</span>
+                        </td>
+                        <td style="color:#2196F3">
+                            <i class="fa fa-commenting-o" aria-hidden="true"> {{data.reply_num}}</i>
+                        </td>
+                        <td style="color:#FF9800">
+                            <i class="fa fa-star" aria-hidden="true" v-if="data.collected" @click="mark"></i>
+                            <i class="fa fa-star-o" aria-hidden="true" v-else @click="mark"></i>
+                            <span> {{data.recommend_num}}</span>
+                        </td>
+                        <td style="color:#8BC34A">
+                            <i class="fa fa-eye" aria-hidden="true"> {{data.view_num}}</i>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        <!-- <el-row type="flex" align="middle" style="padding:10px;overflow:hidden">
             <el-col :span="3" right >
                 <el-image style="width:30px;border-radius:50%;height:30px" :src='geturl(data.icon)' @click="$router.push(`/person/${data.owner}`)"></el-image>
             </el-col>
@@ -28,7 +54,7 @@
                 <i class="fa fa-eye" aria-hidden="true"></i>
                 <span style="margin-left:5px">{{data.view_num}}</span>
             </el-col>
-        </el-row>
+        </el-row> -->
     </el-card>
 </template>
 <script>
@@ -36,6 +62,9 @@ import { apiHost,imgHost } from '../../../../apiConfig';
 export default {
     name:'post',
     props:['data'],
+    mounted(){
+        
+    },
     methods:{
         postClick(id){
             this.$router.push(`/content/${id}`);
@@ -66,7 +95,32 @@ export default {
                     }
                 }
             })
-        }
+        },
+        mark(){
+            const loading = this.$loading({
+                lock: true,
+                target:document.getElementById('post'+this.data.id),
+                text: '操作中...',
+                spinner: 'el-icon-loading',
+                background: 'rgba(0, 0, 0, 0.7)'
+            });
+            this.axios({
+                url:apiHost+'/anon/post/collect?post_title_id='+this.data.id,
+                method:'get'
+            }).then(res=>{
+                loading.close();
+                // console.log(res)
+                if(res.data.code==200){
+                    if(this.data.collected){
+                        this.data.recommend_num-=1;
+                        this.data.collected=false;
+                    }else{
+                        this.data.recommend_num+=1;
+                        this.data.collected=true;
+                    }
+                }
+            })
+        },
     },
 }
 </script>
@@ -74,4 +128,7 @@ export default {
     #postCard:hover{
         filter:brightness(0.9);
     }
+    #infoTable2Content td {
+		padding:0 20px 10px 0;
+	}
 </style>

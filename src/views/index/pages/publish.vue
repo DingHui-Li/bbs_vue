@@ -39,7 +39,7 @@ export default {
         return{
             plates:[],
             districtId:-1,
-            selectedPlate:['1','2-1'],
+            selectedPlate:['1','1-1'],
             editor:null,
             cover:'/default.jpg',
             title:'',
@@ -211,14 +211,20 @@ export default {
                 method:'get'
             }).then(res=>{
                 loading.close();
+                console.log(this.plates)
                 if(res.data.code==200){
                     this.title=res.data.Content.title;
                     this.cover=res.data.Content.image;
                     this.editor.txt.html(res.data.Content.content);
-                    this.selectedPlate.push('1');
-                    this.selectedPlate.push('1-2');
+
+                    let plateId=res.data.plateInfo.id;
+                    let distId=res.data.disInfo.id;
+                    this.districtId=distId;
+                    this.selectedPlate=[];
+                    this.selectedPlate.push(plateId);
+                    this.selectedPlate.push(plateId+'-'+distId);
                 }
-                console.log(res)
+
             })
         }
     },

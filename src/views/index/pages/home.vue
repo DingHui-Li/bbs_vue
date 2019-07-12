@@ -11,10 +11,12 @@
                     <el-tab-pane v-for="(plate,index) in plates" :key="'tab_'+plate.plate_name" :label="plate.plate_name" :name="index+''">
                         <el-tabs stretch style="padding:0;min-height:50vh" @tab-click="handleClick" v-model="actDistrict" id="district_pane">
                             <el-tab-pane v-for="(district) in plate.districtInfos" :key="'tab_'+district.district_name" :label="district.district_name" :name="district.id+''">
-                                <notice />
+                                <notice :data="totalNotice" type="total" v-if="totalNotice!=[]&&totalNotice.userInfo!=undefined"/>
+                                <notice :data="plateNotice" type="plate" v-if="plateNotice!=[]&&plateNotice.userInfo!=undefined" style="margin:5px 0"/>
+                                <notice :data="districtNotice" v-if="districtNotice!=[]&&districtNotice.userInfo!=undefined"/>
                                 <el-col style="margin:20px 0" align="end">
                                     帖子排序：
-                                    <el-radio-group v-model="sort" >
+                                    <el-radio-group v-model="sort" @change="sortChange()">
                                         <el-radio-button label="最新发布"></el-radio-button>
                                         <el-radio-button label="最新回复"></el-radio-button>
                                         <el-radio-button label="回复数"></el-radio-button>
@@ -44,15 +46,16 @@ export default {
             homeData:[],
             plates:[],
             posts:[],
-            actDistrict:'0'
+            actDistrict:'0',
+            totalNotice:[],
+            plateNotice:[],
+            districtNotice:[]
         }   
     },
     mounted(){
         this.getPlate();
         this.getHomeData();
-    },
-    computed:{
-
+        this.getNotice(-1,-1);
     },
     methods:{
         getPlate(){
@@ -61,34 +64,31 @@ export default {
                 url:apiHost+"/anon/plate/getPlates",
                 method:"get"
             }).then(res=>{
+                console.log(res)
                 if(res!=undefined){
                     this.plates=res.data;
                 }
                 loading.close();
             })
         },
-        plateChange(tab,event){
+        plateChange(tab,event){//父选项卡改变事件
             if(tab.name!='发现'){
                 this.actDistrict=this.plates[tab.name].districtInfos[0].id+'';
+                this.plateNotice=[];
+                this.districtNotice=[];
+                this.getNotice(this.plates[tab.name].id,-1);
             }
         },
-        handleClick(tab, event) {
-            let loading=this.loading('district_pane');
-            this.axios({
-                url:apiHost+"/anon/post/getPostTitles?id="+tab.name,
-                method:'get'
-            }).then(res=>{
-                this.posts=res.data;
-                console.log(res);
-                loading.close();
-            })
+        handleClick(tab, event) {//子选项卡改变事件
+            this.actDistrict=tab.name;
+            this.districtNotice=[];
+            this.getNotice(-1,tab.name);
         },
         getHomeData(){
             this.axios({
                 url:apiHost+'/anon/post/getIndexPostTitles',
                 method:'get'
             }).then(res=>{
-                console.log(res)
                 if(res.data.code==200){
                     this.homeData=res.data.PostTitleList;
                 }
@@ -102,18 +102,51 @@ export default {
                     text: 'Loading',
                     spinner: 'el-icon-loading'
             });
+        },
+        getDistPost(){
+            let loading=this.loading('district_pane');
+                this.axios({
+                    url:apiHost+"/anon/post/getPostTitles?id="+this.actDistrict+"&orderby="+this.getSortType(this.sort),
+                    method:'get'
+                }).then(res=>{
+                    loading.close();
+                    if(res.data.code==200){
+                        this.posts=res.data.postInfos;
+                    }
+            })    
+        },
+        getSortType(label){
+            if(label=='最新发布') return 'post_time';
+            if(label=='最新回复') return 'reply_time';
+            if(label=='回复数') return 'reply_num';
+            if(label=='浏览量') return 'view_num';
+        },
+        sortChange(){
+            this.getDistPost();
+        },
+        getNotice(plate_id,district_id){
+            this.axios({
+                url:apiHost+'/anon/getRecentAnnouncement?plate_id='+plate_id+'&district_id='+district_id,
+                method:'get'
+            }).then(res=>{
+                console.log(res)
+                if(res.data.code==200){
+                    if(plate_id==-1&&district_id==-1){
+                        this.totalNotice=res.data;
+                    }
+                    else if(plate_id!=-1&&district_id==-1){
+                        this.plateNotice=res.data;
+                    }else if(plate_id==-1&&district_id!=-1){
+                        this.districtNotice=res.data;
+                    }
+                }
+            })
         }
     },
     watch:{
         actDistrict:function(newVal,oldVal){
             if(newVal!=oldVal){
-                this.axios({
-                    url:apiHost+"/anon/post/getPostTitles?id="+newVal,
-                    method:'get'
-                }).then(res=>{
-                    this.posts=res.data;
-                    console.log(res);
-                })                    
+                this.getDistPost();       
             }
         }
     }

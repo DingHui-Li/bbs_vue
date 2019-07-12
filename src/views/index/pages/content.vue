@@ -55,11 +55,20 @@
                                 <i class="fa fa-eye" aria-hidden="true" style="font-size:0.8rem;margin-left:20px"> {{post.view_num}}</i>
                             </el-col>
                         </el-col>
-                        <el-col align="center" style="border-top:1px solid #e0e0e0;padding:10px;margin-top:10px;font-weight:bold;color:#757575">查看更多</el-col>
+                        <el-col align="center" 
+                            style="border-top:1px solid #e0e0e0;padding:10px;margin-top:10px;font-weight:bold;color:#757575"
+                            @click="$router.push(`/person/${userData.user_id}`)">
+                            查看更多
+                        </el-col>
                     </el-card>
                 </el-col>
             </el-col>
             <el-card style="box-shadow:none">
+                <div slot="header" style="color:#757575;font-weight:bold;cursor:pointer;padding-left:10px">
+                    <span>{{allData.plateInfo.plate_name}}</span>
+                    <span style="margin:0 5px">/</span>
+                    <span>{{allData.disInfo.district_name}}</span>
+                </div>
                 <el-col style="margin-top:20px">
                     <div style="font-size:1.4rem;margin-bottom:20px">{{postData.title}}</div>
                     <div style="color:#757575;font-size:0.8rem;margin-bottom:20px" align="right">编辑于 {{dateFormat(postData.post_time)}}</div>
@@ -94,12 +103,14 @@
                                 <td style="color:#2196F3">
                                     <i class="fa fa-commenting-o" aria-hidden="true"> {{postData.reply_num}}</i>
                                 </td>
+                                <td style="color:#FF9800">
+                                    <i class="fa fa-star" aria-hidden="true" v-if="postData.collected" @click="mark"></i>
+                                    <i class="fa fa-star-o" aria-hidden="true" v-else @click="mark"></i>
+                                    <span> {{postData.recommend_num}}</span>
+                                </td>
                                 <td style="color:#8BC34A">
                                     <i class="fa fa-eye" aria-hidden="true"> {{postData.view_num}}</i>
                                 </td>
-                                <!-- <td style="color:#FF9800">
-                                    <i class="fa fa-star-o" aria-hidden="true"> {{postData.view_num}}</i>
-                                </td> -->
                             </tr>
                         </table>
                     </el-col>
@@ -125,12 +136,16 @@ export default {
             postData:{},
             userData:{},
             userPostData:[],
-            commentData:[]
+            commentData:[],
+            allData:[]
         }
     },
-    mounted(){
+    created(){
         this.getContent();
-        this.getComment();
+    },
+    mounted(){
+        // this.getContent();
+         this.getComment();
     },
     computed:{
     },
@@ -139,29 +154,24 @@ export default {
             return imgHost+url;
         },
         getContent(){
-            let loading=this.$loading({
-                    fullscreen:false,
-                    target:contentCard,
-                    lock: true,
-                    text: 'Loading',
-                    spinner: 'el-icon-loading'
-            });
             this.axios({
                 url:apiHost+'/anon/post/getPostTitleContent?id='+this.id,
                 method:'get'
             }).then(res=>{
                 if(res.data.code==200){
+                    this.allData=[];
+                    this.allData=res.data;
+                    console.log(this.allData.plateInfo)
                     this.postData=res.data.Content;
                     this.userData=res.data.UserInfo;
                     this.userPostData=res.data.CurrentPostTitle;
                 }
-                loading.close();
                 console.log(res)
             })
         },
         dateFormat(date){
 			let d=new Date(date);
-			return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getUTCDate()+" "+d.getUTCHours()+":"+d.getMinutes()+":"+d.getSeconds();
+			return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getUTCDate()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
         },
         getComment(){
             this.axios({
@@ -193,6 +203,31 @@ export default {
                     }else{
                         this.postData.like_num+=1;
                         this.postData.liked=true;
+                    }
+                }
+            })
+        },
+        mark(){
+            const loading = this.$loading({
+                lock: true,
+                target:contentCard,
+                text: '操作中...',
+                spinner: 'el-icon-loading',
+                background: 'rgba(0, 0, 0, 0.7)'
+            });
+            this.axios({
+                url:apiHost+'/anon/post/collect?post_title_id='+this.postData.id,
+                method:'get'
+            }).then(res=>{
+                loading.close();
+                console.log(res)
+                if(res.data.code==200){
+                    if(this.postData.collected){
+                        this.postData.recommend_num-=1;
+                        this.postData.collected=false;
+                    }else{
+                        this.postData.recommend_num+=1;
+                        this.postData.collected=true;
                     }
                 }
             })
