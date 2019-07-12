@@ -39,7 +39,7 @@ export default {
         return{
             plates:[],
             districtId:-1,
-            selectedPlate:['1','1-1'],
+            selectedPlate:[],
             editor:null,
             cover:'/default.jpg',
             title:'',

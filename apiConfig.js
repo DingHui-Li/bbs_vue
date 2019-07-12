@@ -1,3 +1,3 @@
 export const imgHost="http://lidh.top:8084/imgservice"
-//export const apiHost="http://39.108.208.140:8080"
-export const apiHost="http://6f9e1fc4.ngrok.io"
+export const apiHost="http://39.108.208.140:8080"
+//export const apiHost="http://6f9e1fc4.ngrok.io"

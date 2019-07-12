@@ -1,5 +1,5 @@
 <template>
-    <el-card class="animated flipInY" style="animation-duration:0.5s">
+    <el-card class="animated flipInY" style="animation-duration:1s">
         <div slot="header">
             <i class="fa fa-chevron-left" aria-hidden="true" @click="back()"></i>
         </div>

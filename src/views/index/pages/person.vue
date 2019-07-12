@@ -1,7 +1,7 @@
 <template>
     <el-row type="flex" justify="center" :gutter="20" style="padding:0;">
         <el-col :lg='14'  :md='18' :xs='24' style="padding-top:40px;" id="personCard">
-			<div v-if="!isModify" class="animated flipInY" style="animation-duration:0.5s">
+			<div v-if="!isModify" class="animated flipInY" style="animation-duration:1s">
 				<el-card style="padding:10px 0;box-shadow:none" >
 					<el-col :span="8" id="avatar" :xs="24" align="center">
 						<el-image  :src="geturl(userInfo.icon)"  style="width:200px;height:200px;border-radius:50%" fit="cover" >
@@ -13,9 +13,7 @@
 					<el-col :span="16" :xs="24" style="padding:0 30px;margin:10px 0" >
 						<div>
 							<span style="font-weight:bold;font-size:1.4rem;float:left">{{userInfo.nick_name}}</span>
-							<!-- <el-button style="margin-left:40px">修改个人信息</el-button>
-							<el-button style="margin-left:40px">修改账号信息</el-button>
-							<el-button @click="$router.replace('/publish')">测试</el-button> -->
+							<el-button @click="$router.replace('/publish')">测试</el-button>
 							<div style="float:right" v-if="isme">
 								<i class="fa fa-cog" aria-hidden="true" @click="isModify=true"></i>
 							</div>

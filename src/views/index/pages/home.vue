@@ -4,16 +4,16 @@
             <el-card style="padding:0;box-shadow:none;border:none;min-height:100vh" id="homeCard">
                 <el-tabs stretch style="color:#000;box-shadow:none;border:none;padding:0" type="border-card" :value="'发现'" @tab-click="plateChange">
                     <el-tab-pane label="发现" :name="'发现'">
-                        <el-col :xl="6" :lg="8" :sm="12" :xs="24" v-for="post in homeData" :key="'homepost'+post.id">
-                            <post :data='post'></post>
+                        <el-col style="padding:0">
+                            <post v-for="post in homeData" :key="'homepost'+post.id" :data='post'></post>
                         </el-col>
                     </el-tab-pane>
                     <el-tab-pane v-for="(plate,index) in plates" :key="'tab_'+plate.plate_name" :label="plate.plate_name" :name="index+''">
                         <el-tabs stretch style="padding:0;min-height:50vh" @tab-click="handleClick" v-model="actDistrict" id="district_pane">
                             <el-tab-pane v-for="(district) in plate.districtInfos" :key="'tab_'+district.district_name" :label="district.district_name" :name="district.id+''">
-                                <notice :data="totalNotice" type="total" v-if="totalNotice!=[]&&totalNotice.userInfo!=undefined"/>
-                                <notice :data="plateNotice" type="plate" v-if="plateNotice!=[]&&plateNotice.userInfo!=undefined" style="margin:5px 0"/>
-                                <notice :data="districtNotice" v-if="districtNotice!=[]&&districtNotice.userInfo!=undefined"/>
+                                <notice :data="totalNotice" type="total" />
+                                <notice :data="plateNotice" type="plate" style="margin:5px 0"/>
+                                <notice :data="districtNotice" />
                                 <el-col style="margin:20px 0" align="end">
                                     帖子排序：
                                     <el-radio-group v-model="sort" @change="sortChange()">
@@ -23,8 +23,8 @@
                                         <el-radio-button label="浏览量"></el-radio-button>
                                     </el-radio-group>
                                 </el-col>
-                                <el-col :xl="6" :lg="8" :sm="12" :xs="24" v-for="post in posts" :key="'post'+post.id">
-                                    <post :data='post'></post>
+                                <el-col style="padding:0">
+                                    <post v-for="post in posts" :key="'post'+post.id" :data='post'></post>
                                 </el-col>
                             </el-tab-pane>
                         </el-tabs>
@@ -77,12 +77,13 @@ export default {
                 this.plateNotice=[];
                 this.districtNotice=[];
                 this.getNotice(this.plates[tab.name].id,-1);
+                this.getNotice(-1, this.actDistrict);
             }
         },
         handleClick(tab, event) {//子选项卡改变事件
             this.actDistrict=tab.name;
             this.districtNotice=[];
-            this.getNotice(-1,tab.name);
+            this.getNotice(-1, this.actDistrict);
         },
         getHomeData(){
             this.axios({

@@ -19,7 +19,6 @@ const login=()=>import('./pages/login')
 const home=()=>import('./pages/home')
 const selected=()=>import('./pages/selected')
 const plate=()=>import('./pages/plate')
-const notice=()=>import('./pages/notice')
 const person=()=>import('./pages/person')
 const publish=()=>import('./pages/publish')
 const content=()=>import('./pages/content')
@@ -30,7 +29,6 @@ const routes=[{path:'/',component:toolbar,children:[
 					{path:'home',component:home},
 					{path:'selected',component:selected},
 					{path:'plate',component:plate},
-					{path:'notice',component:notice},
 					{path:'login',component:login},	
 					{path:'person/:id',component:person},
 					{path:'publish',component:publish},

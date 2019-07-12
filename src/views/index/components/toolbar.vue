@@ -59,7 +59,6 @@ export default {
             tabs:[{'name':'首页','to':'/home'},
                     {'name':'精选','to':'/selected'},
                     {'name':'板块','to':'/plate'},
-                    {'name':'公告','to':'/notice'},
                     ],
             sideNav:false,
             active:'/home',

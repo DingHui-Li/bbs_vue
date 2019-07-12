@@ -1,5 +1,6 @@
 <template>
-    <el-card :body-style="{padding:'0px'}" style="border-radius:10px;margin:10px 0;cursor:pointer" :id="'post'+data.id">
+    <el-col  :xl="6" :lg="8" :sm="12" :xs="24">
+    <el-card :body-style="{padding:'0px'}" style="border-radius:10px;margin:10px 0;cursor:pointer;" :id="'post'+data.id">
         <!-- 封面 -->
         <el-image :src="geturl(data.image)"
             style="width:100%;height:auto;border-radius:10px 10px 0 0;" fit="cover" @click="postClick(data.id)">
@@ -11,13 +12,13 @@
             </div>
         </el-image>
         <!-- 标题 -->
-        <div style="padding:10px;border-bottom:1px solid #ccc;margin-bottom:10px" @click="postClick(data.id)">{{data.title}}</div>
+        <div style="padding:10px;border-bottom:1px solid #ccc;margin-bottom:10px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-weight:bold" @click="postClick(data.id)">{{data.title}}</div>
         <div style="padding:10px">
             <div style="float:left;width:30px;">
                 <el-image style="width:30px;border-radius:50%;height:30px" :src='geturl(data.icon)' @click="$router.push(`/person/${data.owner}`)"></el-image>
             </div>
             <span @click="$router.push(`/person/${data.owner}`)" style="font-weight:bold;color:#757575;margin-top:5px;line-height:30px">{{data.nick_name}}</span>
-            <table style="font-weight:bold;font-size:0.9rem"  id="infoTable2Content" align="right">
+            <table style="font-weight:bold;font-size:0.9rem"  id="infoTable2Home" align="right">
                     <tr>
                         <td style="color:#FF5252">
                             <i class="fa fa-heart" aria-hidden="true" v-if="data.liked" @click='like()'></i>
@@ -38,24 +39,8 @@
                     </tr>
                 </table>
             </div>
-        <!-- <el-row type="flex" align="middle" style="padding:10px;overflow:hidden">
-            <el-col :span="3" right >
-                <el-image style="width:30px;border-radius:50%;height:30px" :src='geturl(data.icon)' @click="$router.push(`/person/${data.owner}`)"></el-image>
-            </el-col>
-            <el-col :span="10" left >
-                <span @click="$router.push(`/person/${data.owner}`)" style="font-weight:bold;color:#757575">{{data.nick_name}}</span>
-            </el-col>
-            <el-col :span="5" left>
-                <i class="fa fa-heart" style="color:red" aria-hidden="true" v-if="data.liked" @click='like()'></i>
-                <i class="fa fa-heart-o" aria-hidden="true" v-else @click='like()'></i>
-                <span style="margin-left:5px">{{data.like_num}}</span>
-            </el-col>
-            <el-col :span="5" left>
-                <i class="fa fa-eye" aria-hidden="true"></i>
-                <span style="margin-left:5px">{{data.view_num}}</span>
-            </el-col>
-        </el-row> -->
     </el-card>
+    </el-col>
 </template>
 <script>
 import { apiHost,imgHost } from '../../../../apiConfig';
@@ -128,7 +113,7 @@ export default {
     #postCard:hover{
         filter:brightness(0.9);
     }
-    #infoTable2Content td {
-		padding:0 20px 10px 0;
+    #infoTable2Home td {
+		padding:0 5px;
 	}
 </style>

@@ -14,7 +14,7 @@
             <i class="fa fa-trash" aria-hidden="true" @click="deleteMark()"></i>
         </div> -->
         <div style="padding-top:50px;padding-left:150px">
-            <div style="padding:10px;border-bottom:1px solid #ccc;margin-bottom:10px" @click="postClick(data.post_title_id)">{{data.title}}</div>
+            <div style="padding:10px;border-bottom:1px solid #ccc;margin-bottom:10px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;" @click="postClick(data.post_title_id)">{{data.title}}</div>
             <div style="float:left;margin-left:5px">
                 <el-image :src="geturl(data.icon)" style="width:30px;height:30px" @click="$router.push(`/person/${data.user_id}`)"></el-image>
             </div>

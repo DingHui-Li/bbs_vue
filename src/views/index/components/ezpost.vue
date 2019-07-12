@@ -15,7 +15,7 @@
             <i class="fa fa-trash" aria-hidden="true" @click="deletePost"></i>
         </div>
         <div style="padding-top:50px;padding-left:150px">
-            <div style="padding:10px;border-bottom:1px solid #ccc;margin-bottom:10px" @click="postClick(data.id)">
+            <div style="padding:10px;border-bottom:1px solid #ccc;margin-bottom:10px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;" @click="postClick(data.id)">
                 {{data.title}}
             </div>
             <table style="font-weight:bold"  id="infoTable2Content" align="right">
