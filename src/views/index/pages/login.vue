@@ -1,5 +1,6 @@
 <template>
-    <div :style="{height:'100vh',width:'100%',position:'fixed',left:0,top:0,zIndex:0,backgroundImage:'url('+require('../../../assets/bg.png')+')'}">
+    <div id="background" :style="{height:'100vh',width:'100%',position:'fixed',left:0,top:0,zIndex:0,
+        backgroundImage:'url('+require('../../../assets/bg.png')+')',backgroundSize:'50% 50%,'}">
         <div style="height:100vh;width:100%;position:fixed;background-color:rgba(0,0,0,0.4)">  
             <el-row type="flex" justify="center" align="middle" style="height:100%;">
                     <el-col :xs="18" :sm="14" :md="12" :lg="8" :xl='4'>
@@ -16,7 +17,7 @@
                     </el-col>
             </el-row>
         </div>
-        <el-dialog :visible.sync="loginDialog"  center :append-to-body='true' :close-on-click-modal='false'>
+        <el-dialog :visible.sync="loginDialog"  center :append-to-body='true' :close-on-click-modal='false' width="500px">
             <span>
                 <div style="font-size:5rem;color:#409EFF;margin-bottom:20px" align="center"> <img :src="require('../../../assets/logo.png')" alt=""></div>
                 <el-input v-model="name" maxlength="20"  show-word-limit minlength="2">
@@ -32,7 +33,7 @@
                 <div align="center" style="margin-top:30px;color:#454545">没有账号？<span style="color:#409EFF;cursor:pointer" @click="registerDialog=true;loginDialog=false">去注册</span></div>
             </span>
         </el-dialog>
-        <el-dialog :visible.sync="registerDialog"  center :append-to-body='true' :close-on-click-modal='false'>
+        <el-dialog :visible.sync="registerDialog"  center :append-to-body='true' :close-on-click-modal='false' width="500px">
             <span>
                 <div style="font-size:5rem;color:#409EFF;margin-bottom:20px" align="center"> <img :src="require('../../../assets/logo.png')" alt=""></div>
                 <el-input v-model="name" maxlength="20"  show-word-limit minlength="2" @change="checkName()">
@@ -113,23 +114,21 @@ export default {
         }
     },
     computed:{
-        createLoading(){
-            return this.$loading({
+    },
+    methods:{
+        login(){
+            let loading1 = this.$loading({
                 lock: true,
                 text: 'Loading',
                 spinner: 'el-icon-loading',
                 background: 'rgba(0, 0, 0, 0.7)'
             });
-        }
-    },
-    methods:{
-        login(){
-            const loading1 = this.createLoading;
             this.axios({
                 url:apiHost+"/login",
                 method:'post',
                 data:{'user_name':this.name,'password':md5(this.pw)}
             }).then((res)=>{
+                loading1.close();
                 if(res.data.code==200){
                     this.loginDialog = false;
                     this.$emit('getUserInfo',res.data)
@@ -138,10 +137,6 @@ export default {
                 }else{
                     this.$message.error(res.data.msg);
                 }
-                loading1.close();
-            }).catch(error=>{
-                loading1.close();
-                this.$message.error(error.message);
             })
         },
         checkName(){
@@ -203,13 +198,19 @@ export default {
             }
         },
         register(){
-            const loading2 = this.createLoading;
             if(this.legal_name&&this.legal_pw&&this.legal_rpw&&this.legal_mail){
+                const loading2 =this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.7)'
+                });
                 this.axios({
                     url:apiHost+'/register',
                     method:'post',
                     data:{'user_name':this.name,'password':md5(this.pw),'mail':this.mail}
                 }).then(res=>{
+                    loading2.close();
                     if(res.data.code==200){
                         this.registerDialog=false;
                         this.$message({
@@ -219,11 +220,7 @@ export default {
                     }else{
                         this.$message.error(res.data.msg);
                     }
-                    loading2.close();
-                }).catch(error=>{
-                loading2.close();
-                this.$message.error(error.message);
-            })
+                })
             }
         }
     },
@@ -286,5 +283,11 @@ export default {
     }
     .el-input-group__append{
         background-color:#fff
+    }
+    #background{
+        background-size: 95% 90%;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-color:rgb(78, 160, 243,0.5)
     }
 </style>

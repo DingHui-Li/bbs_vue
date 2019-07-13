@@ -32,14 +32,16 @@
                 </el-tabs>
             </el-card>
         </el-col>
+        <fab />
     </el-row>
 </template>
 <script>
 import notice from '../components/notice'
 import post from '../components/post'
 import { apiHost } from '../../../../apiConfig';
+import fab from '../components/fab'
 export default {
-    components:{notice,post},
+    components:{notice,post,fab},
     data(){
         return{
             sort:'最新发布',
@@ -56,6 +58,9 @@ export default {
         this.getPlate();
         this.getHomeData();
         this.getNotice(-1,-1);
+    },
+    updated(){
+        this.postLocation();
     },
     methods:{
         getPlate(){
@@ -130,7 +135,7 @@ export default {
                 url:apiHost+'/anon/getRecentAnnouncement?plate_id='+plate_id+'&district_id='+district_id,
                 method:'get'
             }).then(res=>{
-                console.log(res)
+                // console.log(res)
                 if(res.data.code==200){
                     if(plate_id==-1&&district_id==-1){
                         this.totalNotice=res.data;
@@ -142,6 +147,26 @@ export default {
                     }
                 }
             })
+        },
+        postLocation(){
+            let boxs=document.getElementsByClassName('post')[0];
+            let box=boxs[0];
+            let pos=box.getBoundingClientRect();
+            let window_width=document.body.clientWidth;
+            let num=Math.round(window_width/pos.width);
+            let position=[];
+            
+            for(let i =0;i<boxs.length;i++){
+                if(i<num){//第一行
+                    let p=boxs[i].getBoundingClientRect();
+                    position.push({
+                        'x':p.x+p.width,
+                        'y':p.y+p.height
+                    })
+                }
+            }
+            console.log(position)
+            
         }
     },
     watch:{

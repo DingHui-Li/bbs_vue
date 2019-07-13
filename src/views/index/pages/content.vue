@@ -42,7 +42,7 @@
                 <el-col style="padding:0 0 0 10px;" :xs="24" :sm="12" :md="14">
                     <el-card style="border-radius:5px;padding:10px;box-shadow:none">
                         <div slot="header" style="font-weight:bold;color:#757575;">该用户的其他文章</div>
-                        <el-col style="padding-top:15px 0 0 0;cursor:pointer" :md="24" :xs="12" v-for="post in userPostData" :key="'more'+post.id">
+                        <el-col style="padding-top:15px 0 0 0;cursor:pointer" :md="12" :xs="24" v-for="post in userPostData" :key="'more'+post.id">
                             <el-col :md="4" :xs="8" style="margin-top:10px" >
                                 <el-avatar :src="geturl(post.image)" :size="60" shape="square"></el-avatar>
                             </el-col>
@@ -56,15 +56,14 @@
                             </el-col>
                         </el-col>
                         <el-col align="center" 
-                            style="border-top:1px solid #e0e0e0;padding:10px;margin-top:10px;font-weight:bold;color:#757575"
-                            @click="$router.push(`/person/${userData.user_id}`)">
-                            查看更多
+                            style="border-top:1px solid #e0e0e0;padding:10px;margin-top:10px;font-weight:bold;color:#757575;cursor:pointer">
+                            <span @click="$router.push(`/person/${userData.user_id}`)"> 查看更多</span>
                         </el-col>
                     </el-card>
                 </el-col>
             </el-col>
             <el-card style="box-shadow:none">
-                <div slot="header" style="color:#757575;font-weight:bold;cursor:pointer;padding-left:10px">
+                <div slot="header" style="color:#757575;font-weight:bold;cursor:pointer;padding-left:10px" v-if="allData.plateInfo!=undefined">
                     <span>{{allData.plateInfo.plate_name}}</span>
                     <span style="margin:0 5px">/</span>
                     <span>{{allData.disInfo.district_name}}</span>
@@ -122,14 +121,16 @@
                 <comments v-for="comment in commentData" :key="'comment'+comment.id" :data="comment"/>
             </el-col>
         </el-col>
+        <fab />
     </el-row>
 </template>
 <script>
 import comments from '../components/comments'
 import comment from '../components/comment'
 import { apiHost,imgHost } from '../../../../apiConfig';
+import fab from '../components/fab'
 export default {
-    components:{comment,comments},
+    components:{comment,comments,fab},
     data(){
         return{
             id:this.$route.params.id,//帖子id
@@ -140,12 +141,9 @@ export default {
             allData:[]
         }
     },
-    created(){
-        this.getContent();
-    },
     mounted(){
-        // this.getContent();
-         this.getComment();
+        this.getContent();
+        this.getComment();
     },
     computed:{
     },

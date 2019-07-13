@@ -10,9 +10,9 @@
 				<div style="font-size:0.8rem;color:#757575;margin:5px 0">{{dateFormat(data.reply_time)}}</div>
 				<div>{{data.content}}</div>
 			</el-col>
-			<el-col :sm="3" :xs="5" style="color:#757575;font-size:0.9rem">
+			<!-- <el-col :sm="3" :xs="5" style="color:#757575;font-size:0.9rem">
 				删除
-			</el-col>
+			</el-col> -->
 			<!-- <el-col>
 				<div style="background-color:#f9f9f9;border-radius:10px;padding:10px">s</div>
 			</el-col> -->

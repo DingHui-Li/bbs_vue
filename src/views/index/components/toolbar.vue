@@ -27,7 +27,7 @@
                         <el-menu-item index="/person" align="center" @click="goPerson()">个人主页</el-menu-item>    
                         <el-menu-item index="6-2" align="center" @click="logout()">登出</el-menu-item>       
                     </el-submenu>
-                    <el-menu-item v-else>
+                    <el-menu-item v-else class="hidden-sm-and-down">
                         <i class="fa fa-user" aria-hidden="true" @click="login()" style="font-size:1.3rem"></i>
                         <span style="font-size:0.8rem" @click="login()"> 未登录</span>
                     </el-menu-item>
@@ -125,7 +125,7 @@ export default {
                 url:apiHost+'/checkSession',
                 method:'post',
             }).then(res=>{
-                console.log(res.data.msg)
+                console.log(res.data)
                 if(res.data.code==200) this.islogin=true;
                 else this.islogin=false;
             })

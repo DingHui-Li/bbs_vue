@@ -13,7 +13,6 @@
 					<el-col :span="16" :xs="24" style="padding:0 30px;margin:10px 0" >
 						<div>
 							<span style="font-weight:bold;font-size:1.4rem;float:left">{{userInfo.nick_name}}</span>
-							<el-button @click="$router.replace('/publish')">测试</el-button>
 							<div style="float:right" v-if="isme">
 								<i class="fa fa-cog" aria-hidden="true" @click="isModify=true"></i>
 							</div>
@@ -90,6 +89,7 @@ export default {
 	},
 	methods:{
 		geturl(url){
+			if(url!=undefined)
 			return imgHost+url;
 		},
 		back(){

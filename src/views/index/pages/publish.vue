@@ -158,23 +158,27 @@ export default {
                 spinner: 'el-icon-loading',
                 background: 'rgba(0, 0, 0, 0.7)'
             });
+            let url=apiHost+'/anon/post/addPostTitle';
+            if(this.id!=undefined){
+                url=apiHost+'/anon/post/updatePostTitle'
+            }
             this.axios({
-                url:apiHost+'/anon/post/addPostTitle',
+                url:url,
                 method:'post',
-                data:{'title':this.title,'content':content,'districtInfo_id':this.districtId,'image':this.cover,'owner':id}
+                data:{'title':this.title,'content':content,'districtInfo_id':this.districtId,'image':this.cover,'id':this.id}
             }).then(res=>{
                 if(res.data.code==200){
                     this.editor.txt.clear();
                     this.title="";
                     this.cover="";
                     this.$notify({
-                        title: '发布成功',
+                        title: '成功',
                         type: 'success',
                         duration: 2000
                     });
                 }else{
                     this.$notify({
-                        title: '发布失败',
+                        title: '失败',
                         message:res.msg,
                         type: 'error'
                     });

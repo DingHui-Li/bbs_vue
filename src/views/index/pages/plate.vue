@@ -118,20 +118,24 @@
                                     <post v-for="post in posts" :key="'post'+post.id" :data='post'></post>
                                 </el-col>
                             </el-tab-pane>
-                            <el-tab-pane label="精品" name="quality"></el-tab-pane>
+                            <el-tab-pane label="精品" name="quality">
+                                <post v-for="post in qualityPost" :key="'qualitypost'+post.id" :data='post'></post>
+                            </el-tab-pane>
                         </el-tabs>
                     </el-card>
                 </el-main>
             </el-container>
         </el-col>
+        <fab />
     </el-row>
 </template>
 <script>
 import { apiHost, imgHost } from '../../../../apiConfig';
 import notice from '../components/notice'
 import post from '../components/post'
+import fab from '../components/fab'
 export default {
-    components:{notice,post},
+    components:{notice,post,fab},
     data(){
         return{
             plates:[],
@@ -142,7 +146,8 @@ export default {
             plateNotice:[],
             districtNotice:[],
             sort:"最新发布",
-            posts:[]
+            posts:[],
+            qualityPost:[]
         }
     },
     mounted(){
@@ -161,6 +166,7 @@ export default {
                     this.getNotice(-1,this.plates[0].districtInfos[0].id);
                     this.actDistrict=this.plates[0].districtInfos[0].id;
                     this.getDistPost();
+                    this.getQuality();
                     this.actDistrictName=this.plates[0].districtInfos[0].district_name;
                     this.actPlateName=this.plates[0].plate_name;
                 }
@@ -192,7 +198,6 @@ export default {
                         this.districtNotice=res.data;
                     }
                 }
-                console.log(res)
             })
         },
         changeDist(plate_id,district_id,plate_name,district_name){
@@ -200,6 +205,7 @@ export default {
             // this.actPlateName=plate_name;
             this.actDistrict=district_id;
             this.getDistPost();
+            this.getQuality();
             this.getNotice(plate_id,-1);
             this.getNotice(-1,district_id);
             this.getPlateNameANDDistrictName();
@@ -230,6 +236,16 @@ export default {
                     }
                 }
             }
+        },
+        getQuality(){
+            this.axios({
+                url:apiHost+'/anon/post/getRecommendPostTitles?district_id='+this.actDistrict,
+                method:'get'
+            }).then(res=>{
+                if(res.data.code==200){
+                    this.qualityPost=res.data.recomdTitles;
+                }
+            })
         }
     }
 }

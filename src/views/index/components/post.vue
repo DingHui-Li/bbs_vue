@@ -1,6 +1,6 @@
 <template>
     <el-col  :xl="6" :lg="8" :sm="12" :xs="24">
-    <el-card :body-style="{padding:'0px'}" style="border-radius:10px;margin:10px 0;cursor:pointer;" :id="'post'+data.id">
+    <el-card :body-style="{padding:'0px'}" style="border-radius:10px;margin:10px 0;cursor:pointer;" :id="'post'+data.id" class="post">
         <!-- 封面 -->
         <el-image :src="geturl(data.image)"
             style="width:100%;height:auto;border-radius:10px 10px 0 0;" fit="cover" @click="postClick(data.id)">

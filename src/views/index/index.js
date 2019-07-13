@@ -11,7 +11,6 @@ import axios from 'axios'
 
 import animated from 'animate.css'
 
-import {apiHost} from '../../../apiConfig'
 // ===============================================
 const toolbar=()=>import('./components/toolbar')
 
@@ -29,6 +28,7 @@ const routes=[{path:'/',component:toolbar,children:[
 					{path:'home',component:home},
 					{path:'selected',component:selected},
 					{path:'plate',component:plate},
+					{path:'plate/:id',component:plate},
 					{path:'login',component:login},	
 					{path:'person/:id',component:person},
 					{path:'publish',component:publish},
