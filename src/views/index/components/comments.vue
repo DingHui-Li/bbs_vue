@@ -1,6 +1,6 @@
 <template>
 	<!-- 展示评论的组件 -->
-	<el-card style="padding:20px;box-shadow:none">
+	<el-card style="padding:20px;box-shadow:none;animation-duration:.5s"  class="animated fadeInUp">
 		<el-col :sm="1" :xs="2" style="padding:0">
 			<el-image :src="geturl(data.icon)" style="width:35px;border-radius:50%;height:35px" @click="$router.push(`/person/${data.user_id}`)"></el-image>
 		</el-col>

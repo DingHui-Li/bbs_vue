@@ -1,9 +1,10 @@
 <template>
-    <el-col  :xl="6" :lg="8" :sm="12" :xs="24">
-    <el-card :body-style="{padding:'0px'}" style="border-radius:10px;margin:10px 0;cursor:pointer;" :id="'post'+data.id" class="post">
+    <el-col  :xl="6" :lg="8" :sm="12" :xs="24" :class="className">
+    <el-card :body-style="{padding:'0px'}" style="border-radius:10px;margin:10px 0;cursor:pointer;animation-duration:.5s" 
+            :id="'post'+data.id" class="animated fadeInUp" >
         <!-- 封面 -->
-        <el-image :src="geturl(data.image)"
-            style="width:100%;height:auto;border-radius:10px 10px 0 0;" fit="cover" @click="postClick(data.id)">
+        <el-image :src="geturl(data.image)" @load="setPosition"
+            style="width:100%;height:auto;border-radius:10px 10px 0 0;max-height:500px" fit="cover" @click="postClick(data.id)">
             <div slot="error" class="image-slot" align="center" style="margin-top:20px">
                 <i class="el-icon-picture-outline" ></i>
             </div>
@@ -12,13 +13,14 @@
             </div>
         </el-image>
         <!-- 标题 -->
-        <div style="padding:10px;border-bottom:1px solid #ccc;margin-bottom:10px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-weight:bold" @click="postClick(data.id)">{{data.title}}</div>
-        <div style="padding:10px">
+        <div class="title" style="border-bottom:1px solid #ccc;" @click="postClick(data.id)">{{data.title}}</div>
+        <div style="padding:10px;">
             <div style="float:left;width:30px;">
                 <el-image style="width:30px;border-radius:50%;height:30px" :src='geturl(data.icon)' @click="$router.push(`/person/${data.owner}`)"></el-image>
             </div>
-            <span @click="$router.push(`/person/${data.owner}`)" style="font-weight:bold;color:#757575;margin-top:5px;line-height:30px">{{data.nick_name}}</span>
-            <table style="font-weight:bold;font-size:0.9rem"  id="infoTable2Home" align="right">
+            <span @click="$router.push(`/person/${data.owner}`)" style="font-weight:bold;color:#757575;margin:5px 0 0 3px;line-height:30px;
+                overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"> {{data.nick_name}}</span>
+            <table style="font-weight:bold;font-size:0.9rem;clear:both;margin-bottom:10px"  id="infoTable2Home" align="right">
                     <tr>
                         <td style="color:#FF5252">
                             <i class="fa fa-heart" aria-hidden="true" v-if="data.liked" @click='like()'></i>
@@ -46,9 +48,14 @@
 import { apiHost,imgHost } from '../../../../apiConfig';
 export default {
     name:'post',
-    props:['data'],
+    props:['data','className','length','parent'],
+    data(){
+        return{
+            
+        }
+    },
     mounted(){
-        
+
     },
     methods:{
         postClick(id){
@@ -106,6 +113,9 @@ export default {
                 }
             })
         },
+        setPosition(){
+            this.$emit('postLoadComplete',this.className,this.length,this.parent);
+        }
     },
 }
 </script>
@@ -115,5 +125,13 @@ export default {
     }
     #infoTable2Home td {
 		padding:0 5px;
+	}
+    .title{
+		padding:10px;
+		margin-bottom:10px;
+		overflow:hidden;
+		white-space:nowrap;
+		text-overflow:ellipsis;
+		font-weight:bold;
 	}
 </style>

@@ -1,8 +1,8 @@
 <template>
-<!-- 个人中心页的收藏帖子组件 -->
-    <el-card :id="'markPost'+data.post_title_id" :body-style="{padding:'0px'}" style="border-radius:10px;margin:10px 0;cursor:pointer;box-shadow:none">
+    <el-card class="post_horizontal animated fadeInUp" :id="'post_horizontal'+data.post_title_id" :body-style="{padding:'0px'}" 
+            style="border-radius:10px;margin:10px 0;cursor:pointer;animation-duration:.5s">
         <el-image :src="geturl(data.image)"
-            style="width:150px;height:150px;float:left" fit="cover" @click="postClick(data.id)">
+            style="width:150px;height:150px;float:left" fit="cover" @click="postClick">
             <div slot="error" class="image-slot" align="center" style="margin-top:20px">
                 <i class="el-icon-picture-outline" ></i>
             </div>
@@ -14,11 +14,13 @@
             <i class="fa fa-trash" aria-hidden="true" @click="deleteMark()"></i>
         </div> -->
         <div style="padding-top:50px;padding-left:150px">
-            <div style="padding:10px;border-bottom:1px solid #ccc;margin-bottom:10px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;" @click="postClick(data.post_title_id)">{{data.title}}</div>
+            <div class="title" @click="postClick">{{data.title}}</div>
             <div style="float:left;margin-left:5px">
-                <el-image :src="geturl(data.icon)" style="width:30px;height:30px" @click="$router.push(`/person/${data.user_id}`)"></el-image>
+                <el-image :src="geturl(data.icon)" style="width:30px;height:30px;border-radius:50%" @click="$router.push(`/person/${data.user_id}`)" v-if="type=='mark'"></el-image>
+                <el-image :src="geturl(data.icon)" style="width:30px;height:30px;border-radius:50%" @click="$router.push(`/person/${data.owner}`)" v-else></el-image>
             </div>
-            <div style="padding-top:7px;float:left" @click="$router.push(`/person/${data.user_id}`)">{{data.nick_name}}</div>
+            <div style="padding-left:5px;float:left;line-height:30px;font-weight:bold;color:#757575" @click="$router.push(`/person/${data.user_id}`)" v-if="type=='mark'">{{data.nick_name}}</div>
+            <div style="padding-left:5px;float:left;line-height:30px;font-weight:bold;color:#757575" @click="$router.push(`/person/${data.owner}`)" v-else>{{data.nick_name}}</div>
             <div>
                 <table style="font-weight:bold"  id="infoTable2Content" align="right">
                     <tr>
@@ -48,11 +50,14 @@
 <script>
 import { apiHost,imgHost } from '../../../../apiConfig';
 export default {
-    name:'markPost',
-    props:['data','isme'],
+    name:'post_horizontal',
+    props:['data','isme','type'],
     methods:{
         postClick(id){
-            this.$router.replace(`/content/${id}`);
+            if(this.type=="mark")
+                this.$router.push(`/content/${this.data.post_title_id}`);
+            else
+                this.$router.push(`/content/${this.data.id}`);
         },
         geturl(url){
             return imgHost+url;
@@ -60,7 +65,7 @@ export default {
         mark(){
             const loading = this.$loading({
                 lock: true,
-                target:document.getElementById('markPost'+this.data.post_title_id),
+                target:document.getElementById('post_horizontal'+this.data.post_title_id),
                 text: '操作中...',
                 spinner: 'el-icon-loading',
                 background: 'rgba(0, 0, 0, 0.7)'
@@ -116,4 +121,12 @@ export default {
     #infoTable2Content td {
 		padding:0 30px 10px 0;
 	}
+    .post_horizontal .title{
+        padding:10px;
+        border-bottom:1px solid #ccc;
+        margin-bottom:10px;
+        overflow:hidden;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+    }
 </style>

@@ -11,6 +11,8 @@ import axios from 'axios'
 
 import animated from 'animate.css'
 
+import '../../assets/font-awesome-4.7.0/css/font-awesome.min.css'
+
 // ===============================================
 const toolbar=()=>import('./components/toolbar')
 
@@ -22,12 +24,13 @@ const person=()=>import('./pages/person')
 const publish=()=>import('./pages/publish')
 const content=()=>import('./pages/content')
 const news=()=>import('./pages/news')
+const empty=()=>import('../../components/empty')
 
 const routes=[{path:'/',component:toolbar,children:[
 					{path:'/',redirect:'home'},
-					{path:'home',component:home},
+					{path:'home',component:home,meta:{keepAlive:true}},
 					{path:'selected',component:selected},
-					{path:'plate',component:plate},
+					{path:'plate',component:plate,meta:{keepAlive:true}},
 					{path:'plate/:id',component:plate},
 					{path:'login',component:login},	
 					{path:'person/:id',component:person},
@@ -35,6 +38,7 @@ const routes=[{path:'/',component:toolbar,children:[
 					{path:'publish/:id',component:publish},
 					{path:'content/:id',component:content},
 					{path:'news/:type',component:news},
+					{path:'empty',component:empty},
 				]},]
 const router=new VueRouter({routes})
 

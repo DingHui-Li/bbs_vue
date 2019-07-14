@@ -1,7 +1,7 @@
 <template>
     <el-row type="flex" justify="center" align="middle" :gutter="20" class="animated fadeIn">
         <el-col :xl="16" :lg='18' :md='20' :xs='24' style="padding:0;margin-top:30px;cursor:pointer" align="center" v-if="postData[0]!=undefined">
-            <el-col :xs="24" :sm="8">
+            <el-col :xs="24" :sm="8" class="animated fadeInDown">
                 <div>
                     <i style="font-size:1.8rem;font-weight:bold">2nd</i>
                 </div>
@@ -18,19 +18,19 @@
                     </div>
                 </div>
             </el-col>
-            <el-col :xs="24" :sm="8">
+            <el-col :xs="24" :sm="8" class="animated fadeInDown">
                 <div>
                     <i style="font-size:2.5rem;font-weight:bold">1st</i>
                 </div>
                 <div style="width:300px;height:300px;margin:0 20px"  class="top3">
-                    <el-image style="width:100%;border-radius:5px 5px 0 0" 
+                    <el-image style="width:100%;height:200px;border-radius:5px 5px 0 0;" 
                     :src="geturl(postData[0].postTitle.image)" fit="cover" @click="goPost(0)">
                     </el-image>
                     <div style="margin-top:30px;padding:5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis" 
                         align="center" @click="goPost(0)"> 
                         {{postData[0].postTitle.title}}
                     </div>
-                    <div class="info" style="line-height:50px">
+                    <div class="info">
                         <i class="fa fa-heart-o" aria-hidden="true" style="color:#FF5252"> {{postData[0].postTitle.like_num}}</i>
                         <i class="fa fa-commenting-o" aria-hidden="true" style="margin:0 20px;color:#2196F3"> {{postData[0].postTitle.reply_num}}</i>
                         <i class="fa fa-star-o" aria-hidden="true" style="margin-right:20px;color:#FF9800"> {{postData[0].postTitle.recommend_num}}</i>
@@ -38,7 +38,7 @@
                     </div>
                 </div>
             </el-col>
-            <el-col :xs="24" :sm="8">
+            <el-col :xs="24" :sm="8" class="animated fadeInDown">
                 <div>
                     <i style="font-size:1.8rem;font-weight:bold">3rd</i>
                 </div>
@@ -58,7 +58,7 @@
             <el-col id="divider">
                 <el-divider></el-divider>
             </el-col>
-            <el-col align="left" class="topItem" v-for="(post,index) in postData" :key="'top'+index">
+            <el-col align="left" class="topItem animated fadeInUp" style="animation-duration:.5s" v-for="(post,index) in postData" :key="'top'+index">
                 <template v-if="index>2" style="padding:0">
                     <div style="float:left;width:150px;height:150px;margin:0" @click="goPost(index)">
                         <el-image :src="geturl(post.postTitle.image)" 

@@ -1,6 +1,6 @@
 <template>
     <el-col v-if="data.userInfo!=undefined">
-        <el-card style="border-radius:20px;border:2px solid #6699FF;padding:20px">
+        <el-card style="border-radius:20px;padding:20px;animation-duration:.5s" class="animated fadeInLeft">
             <el-row  >
                 <el-col>
                     <div style="width:30px;float:left;margin-right:5px"  @click="$router.push(`/person/${data.userInfo.id}`)">
@@ -13,7 +13,7 @@
                     <span style="font-size:1.1rem;font-style:bold">{{data.topAnnouncement.title}}
                         <span v-if="type=='total'" style="font-size:0.8rem;color:#757575">（全站公告）</span>
                         <span v-else-if="type=='plate'" style="font-size:0.8rem;color:#757575">（{{data.plate_name}}板块公告）</span>
-                        <span v-else style="font-size:0.8rem;color:#757575">（{{district_name}}区公告）</span>
+                        <span v-else style="font-size:0.8rem;color:#757575">（{{data.district_name}}区公告）</span>
                     </span>
                 </el-col>
                 <el-col>

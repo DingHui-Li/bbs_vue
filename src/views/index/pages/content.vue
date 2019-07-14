@@ -1,7 +1,7 @@
 <template>
     <el-row type="flex" justify="center" :gutter="20">
-        <el-col :xl="12" :lg='16' :md='20' :xs='24' style="padding:5px" id="contentCard">
-            <el-image id="cover" style="width:100%;height:300px;border-radius:5px" :src="geturl(postData.image)" fit="cover">
+        <el-col :xl="14" :lg='16' :md='20' :xs='24' style="padding:5px" id="contentCard">
+            <el-image id="cover" style="width:100%;height:300px;border-radius:5px" :src="geturl(postData.image)" fit="cover" class="animated fadeInDown">
                 <div slot="error" class="image-slot" align="center">
                     <i class="el-icon-picture-outline" style="font-size:100px"></i>
                 </div>
@@ -10,8 +10,8 @@
                 </div>
             </el-image>
             <el-col style="padding:0;margin-bottom:5px">
-                <el-col style="padding:0;" :xs="24" :sm="12" :md="10">
-                    <el-card style="border-radius:5px;padding:10px;box-shadow:none">
+                <el-col style="padding:0;" :xs="24" :sm="12" :md="10" >
+                    <el-card style="border-radius:5px;padding:10px;box-shadow:none"  class="animated fadeInDown">
                         <div slot="header" style="font-weight:bold;color:#757575;">作者</div>
                         <div style="width:60px;float:left;" @click="$router.push(`/person/${userData.user_id}`)">
                             <el-image  :src="geturl(userData.icon)" style="border-radius:50%;width:60px;height:60px" fit="cover"></el-image>
@@ -40,20 +40,20 @@
                     </el-card>
                 </el-col>
                 <el-col style="padding:0 0 0 10px;" :xs="24" :sm="12" :md="14">
-                    <el-card style="border-radius:5px;padding:10px;box-shadow:none">
+                    <el-card style="border-radius:5px;padding:10px;box-shadow:none"  class="animated fadeInDown">
                         <div slot="header" style="font-weight:bold;color:#757575;">该用户的其他文章</div>
-                        <el-col style="padding-top:15px 0 0 0;cursor:pointer" :md="12" :xs="24" v-for="post in userPostData" :key="'more'+post.id">
-                            <el-col :md="4" :xs="8" style="margin-top:10px" >
+                        <el-col style="padding-top:15px 0 0 0;cursor:pointer" :lg="12" :xs="24" v-for="post in userPostData" :key="'more'+post.id">
+                            <div style="margin-top:10px;width:60px;float:left" >
                                 <el-avatar :src="geturl(post.image)" :size="60" shape="square"></el-avatar>
-                            </el-col>
-                            <el-col :md="20" :xs="16" style="margin-top:10px;color:#757575">
-                                <div style="margin-top:10px; white-space: nowrap;text-overflow: ellipsis;overflow:hidden;font-weight:bold;"
+                            </div>
+                            <div style="margin-left:70px;color:#757575;margin-top:20px;font-weight:bold;">
+                                <div style="margin-top:10px; white-space: nowrap;text-overflow: ellipsis;overflow:hidden;"
                                     @click="$router.push(`/content/${post.id}`)">
                                     {{post.title}}
                                 </div>
-                                <i class="fa fa-heart-o" aria-hidden="true" style="font-size:0.8rem"> {{post.like_num}}</i>
-                                <i class="fa fa-eye" aria-hidden="true" style="font-size:0.8rem;margin-left:20px"> {{post.view_num}}</i>
-                            </el-col>
+                                <i class="fa fa-heart-o" aria-hidden="true" style="font-size:0.8rem;font-weight:bold;"> {{post.like_num}}</i>
+                                <i class="fa fa-eye" aria-hidden="true" style="font-size:0.8rem;margin-left:20px;font-weight:bold;"> {{post.view_num}}</i>
+                            </div>
                         </el-col>
                         <el-col align="center" 
                             style="border-top:1px solid #e0e0e0;padding:10px;margin-top:10px;font-weight:bold;color:#757575;cursor:pointer">
@@ -62,7 +62,7 @@
                     </el-card>
                 </el-col>
             </el-col>
-            <el-card style="box-shadow:none">
+            <el-card style="box-shadow:none;animation-duration:1s"  class="animated fadeIn">
                 <div slot="header" style="color:#757575;font-weight:bold;cursor:pointer;padding-left:10px" v-if="allData.plateInfo!=undefined">
                     <span>{{allData.plateInfo.plate_name}}</span>
                     <span style="margin:0 5px">/</span>
@@ -88,7 +88,7 @@
                         I'm angry! 我跟你讲啊，你们这样子啊，是不行的！
                         我今天算是得罪了你们一下！
                     </div> -->
-                    <div style="color:#757575" v-html="postData.content"></div>
+                    <div style="color:#757575" id="content" v-html="postData.content"></div>
                 </el-col>
                 <el-col>
                     <el-divider></el-divider>
@@ -115,7 +115,7 @@
                     </el-col>
                 </el-col>
             </el-card>
-            <el-col style="padding:0">
+            <el-col style="padding:0" class="animated fadeIn">
                 <div style="font-size:1.4rem;font-weight:bold;color:#757575;border-left:5px solid #2196F3;padding-left:10px;margin:20px 0">文章评论</div>
                 <comment :target="id" style="margin-bottom:20px" @updateComment="getComment" />
                 <comments v-for="comment in commentData" :key="'comment'+comment.id" :data="comment"/>
@@ -144,10 +144,18 @@ export default {
     mounted(){
         this.getContent();
         this.getComment();
+        this.toTop();
     },
     computed:{
     },
     methods:{
+        toTop(){
+            var currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            if (currentScroll > 0) {
+                window.requestAnimationFrame(this.toTop);
+                window.scrollTo (0,currentScroll - (currentScroll/5));
+            }
+        },
         geturl(url){
             return imgHost+url;
         },
@@ -243,4 +251,7 @@ export default {
     #infoTable2Content td {
 		padding:0 30px 10px 0;
 	}
+    #contentCard #content img{
+        max-width:500px;
+    }
 </style>

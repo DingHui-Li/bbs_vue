@@ -7,7 +7,7 @@
                         <img :src="require('../../../assets/logo.png')" style="width:50px">
                     </el-menu-item>
                     <el-menu-item class="hidden-md-and-up">
-                        <i class="fa fa-bars" aria-hidden="true" @click="sideNav=true" align="center"></i>
+                        <i class="fa fa-bars" aria-hidden="true" @click="openSideNav" align="center"></i>
                     </el-menu-item>
                     <el-menu-item >
                         <search />
@@ -32,25 +32,36 @@
                         <span style="font-size:0.8rem" @click="login()"> 未登录</span>
                     </el-menu-item>
                 </el-menu>
-                <transition name="el-fade-in-linea">
-                    <div style="width:100vw;height:100vh;position:fixed;z-index:999;background-color:rgba(0,0,0,.3)" v-if="sideNav" @click="sideNav=false">
-                        <el-menu style="width:300px;height:100vh;position:fixed;">
-                            <el-menu-item v-for="tab in tabs" :key="tab.name+2" align="center" @click="$router.replace(tab.to)">
-                                {{tab.name}}
-                            </el-menu-item>
-                        </el-menu>
-                    </div>
-                </transition>
-                </keep-alive>
+            </keep-alive>
         </el-header>
         <el-main style="padding:0;background-color:#e0e0e0;min-height:100vh">
-            <router-view style="margin:0;padding:0" @getUserInfo="getUserInfo"></router-view>
+            <keep-alive>
+                <router-view style="margin:0;padding:0" @getUserInfo="getUserInfo" v-if="$route.meta.keepAlive"></router-view>
+            </keep-alive>
+            <router-view style="margin:0;padding:0" @getUserInfo="getUserInfo" v-if="!$route.meta.keepAlive"></router-view>
         </el-main>
+        <div id="sideNav" class="animated slideInLeft" v-if="sideNav" @click="closeSideNav">
+            <div style="width:300px;height:200px;background-color:#fff" @click="goPerson()" v-if="islogin">
+                <el-image :src="icon" style="width:100%;height:auto;border-radius:50%" fit="cover"></el-image>
+            </div>
+            <div style="width:300px;height:200px;background-color:#fff;line-height:200px;font-size:1.5rem;color:#757575" align="center" v-else  @click="login()">
+                <div>未登录</div>
+            </div>
+            <el-menu style="width:300px;height:100vh;position:fixed;" align="center">
+                <el-menu-item v-for="tab in tabs" :key="tab.name+2" @click="$router.replace(tab.to)" style="font-size:1.5rem;font-weight:bold;color:#757575">
+                    {{tab.name}}
+                </el-menu-item>
+                <el-menu-item @click="$router.replace(`/news/${'system'}`)" style="font-size:1.5rem;font-weight:bold;color:#757575">
+                    消息
+                </el-menu-item>
+            </el-menu>
+        </div>
     </el-container>
 </template>
 <script>
 import {apiHost,imgHost} from '../../../../apiConfig.js'
 import search from '../components/search'
+import { setTimeout } from 'timers';
 export default {
     name:'toolbar',
     components:{search},
@@ -129,6 +140,15 @@ export default {
                 if(res.data.code==200) this.islogin=true;
                 else this.islogin=false;
             })
+        },
+        openSideNav(){
+            this.sideNav=true;
+        },
+        closeSideNav(){
+            sideNav.className='slideOutLeft';
+            setTimeout(()=>{
+                this.sideNav=false;
+            },500)
         }
     },
     watch:{
@@ -152,5 +172,13 @@ export default {
     #searchInput{
         outline:none;
         padding:10px
+    }
+    #sideNav{
+        width:100vw;
+        height:100vh;
+        position:fixed;
+        z-index:99;
+        background-color:rgba(0,0,0,.3);
+        animation-duration:0.5s;
     }
 </style>

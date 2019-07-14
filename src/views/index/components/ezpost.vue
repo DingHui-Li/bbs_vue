@@ -1,6 +1,6 @@
 <template>
     <!-- 个人中心页的帖子组件 -->
-    <el-card :id="'ezpost'+data.id" :body-style="{padding:'0px'}" style="border-radius:10px;margin:10px 0;cursor:pointer;box-shadow:none">
+    <el-card :id="'ezpost'+data.id" :body-style="{padding:'0px'}" style="border-radius:10px;margin:10px 0;cursor:pointer;box-shadow:none;animation-duration:.5s" class="animated fadeInUp">
         <el-image :src="geturl(data.image)"
             style="width:150px;height:150px;float:left" fit="cover" @click="postClick(data.id)">
             <div slot="error" class="image-slot" align="center" style="margin-top:20px">
@@ -15,7 +15,7 @@
             <i class="fa fa-trash" aria-hidden="true" @click="deletePost"></i>
         </div>
         <div style="padding-top:50px;padding-left:150px">
-            <div style="padding:10px;border-bottom:1px solid #ccc;margin-bottom:10px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;" @click="postClick(data.id)">
+            <div style="padding:10px;border-bottom:1px solid #ccc;margin-bottom:10px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-weight:bold;color:#757575" @click="postClick(data.id)">
                 {{data.title}}
             </div>
             <table style="font-weight:bold"  id="infoTable2Content" align="right">

@@ -16,9 +16,9 @@
                 <el-input maxlength="40" show-word-limit style="margin:20px 0" v-model="title">
                     <template slot="prepend">标题：</template>
                 </el-input>
-                <div style="border:1px solid #ccc;border-radius:5px">
-                    <div ref='toolbar' style="overflow:hidden"></div>
-                    <div ref='text' style="height:70%;"></div>
+                <div style="border:1px solid #ccc;border-radius:5px" id='publish'>
+                    <div id='toolbar' style=""></div>
+                    <div id='text' style="min-height:200px;max-height:70vh;"></div>
                 </div>
                 <div align="end" style="margin-top:20px;" id="submitBtn">
                     <el-button style="border-radius:5px 0 0 5px;" type="primary" @click="submit()">发布到</el-button>
@@ -35,6 +35,7 @@
 import wangeditor from 'wangeditor'
 import {imgHost, apiHost} from '../../../../apiConfig.js'
 export default {
+    components:{wangeditor},
     data(){
         return{
             plates:[],
@@ -57,10 +58,10 @@ export default {
             this.districtId=temp[1];
         },
         initEditor(){
-            const editor=new wangeditor(this.$refs.toolbar,this.$refs.text);
+            let editor=new wangeditor('#toolbar','#text');
 			editor.customConfig.uploadImgServer = imgHost+'/blog/upload';
 			editor.customConfig.uploadFileName = 'file';
-			editor.customConfig.zIndex = 1;
+			editor.customConfig.zIndex = 999;
 			editor.customConfig.menus = [
 				 'head',  // 标题
 				'bold',  // 粗体
@@ -75,12 +76,11 @@ export default {
 				'list',  // 列表
 				'justify',  // 对齐方式
 				'quote',  // 引用
-				'emoticon',  // 表情
 				'image',  // 插入图片
 				'code',  // 插入代码
 				'undo',  // 撤销
 				'redo'  // 重复
-			]
+			];
 			const _this=this;
 			editor.customConfig.uploadImgMaxSize = 2 * 1024 * 1024;
 			editor.customConfig.uploadImgMaxLength = 1;
@@ -115,13 +115,18 @@ export default {
                     if(file>( 2 * 1024 * 1024)){
 						alert("图片大小不要超过2M");
                         return;
-					}
+                    }
+                    console.log(file)
+                    let width=file.size.width;
+                    let height=file.size.height;
+                    console.log(width+"asaaassssssssssssssss"+height)
                     _this.axios({
                         url:imgHost+"/img/upload",
                         method:'post',
                         data:data
                     }).then(res=>{
                         if(res.data.code==200){
+
                             _this.cover=res.data.path;
                         }
                     })
@@ -238,6 +243,18 @@ export default {
         if(this.id!=undefined){
             this.getData();
         }
+    },
+    created(){
+            this.axios({
+                url:apiHost+'/checkSession',
+                method:'post',
+            }).then(res=>{
+                if(res.data.code==200) {}
+                else{
+                    this.$message.error('未登录');
+                    this.$router.go(-1);
+                }
+            })
     }
 }
 </script>
@@ -247,5 +264,11 @@ export default {
     }
     #cover:hover{
         filter:brightness(0.5);
+    }
+    .w-e-text{
+        overflow-y: hidden;
+    }
+    .w-e-text-container{
+        overflow-x: hidden !important;
     }
 </style>

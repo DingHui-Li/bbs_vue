@@ -1,5 +1,5 @@
 <template>
-    <div style="position:fixed;top:80%;left:95%">
+    <div style="position:fixed;bottom:10%;right:5%">
         <div class="fab" style="margin-bottom:5px" align="center" @click="$router.push('/publish')">
             <i class="fa fa-pencil" aria-hidden="true" style="font-size:20px;color:#fff;"></i>
         </div>

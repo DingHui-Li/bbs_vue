@@ -1,7 +1,7 @@
 <template>
-    <el-card class="animated flipInY" style="animation-duration:1s">
+    <el-card class="animated fadeIn" style="animation-duration:1s">
         <div slot="header">
-            <i class="fa fa-chevron-left" aria-hidden="true" @click="back()"></i>
+            <i class="fa fa-chevron-left" aria-hidden="true" @click="back()" style="cursor:pointer"> 返回</i>
         </div>
         <el-tabs tab-position="left">
             <el-tab-pane label="修改个人资料">
@@ -43,21 +43,21 @@
                 </div>
             </el-tab-pane>
             <el-tab-pane label="修改账号信息">
-                <el-form label-position="right" label-width="100px">
+                <el-form label-position="right" label-width="100px" :rules="rules" :model="accountInfo">
                     <el-form-item label="账号">
                         <el-input disabled="" v-model="accountInfo.id"></el-input>
                     </el-form-item>
                     <el-form-item label="邮箱">
                         <el-input disabled="" v-model="accountInfo.mail"></el-input>
                     </el-form-item>
-                    <el-form-item label="旧密码">
-                        <el-input v-model="accountInfo.pw" type="password"></el-input>
+                    <el-form-item label="旧密码" prop="passowrd" required="">
+                        <el-input v-model="accountInfo.password" type="password" show-password></el-input>
                     </el-form-item>
-                    <el-form-item label="新密码">
-                        <el-input v-model="accountInfo.newPw" type="password"></el-input>
+                    <el-form-item label="新密码" prop="newPw">
+                        <el-input v-model="accountInfo.newPw" type="password" show-password></el-input>
                     </el-form-item>
-                    <el-form-item label="确认密码">
-                        <el-input v-model="accountInfo.rPw" type="password"></el-input>
+                    <el-form-item label="确认密码" prop="rPw">
+                        <el-input v-model="rPw" type="password" show-password></el-input>
                     </el-form-item>
                 </el-form>
                 <div align="center">
@@ -73,16 +73,31 @@ import md5 from 'js-md5';
 export default {
     name:'modifyInfo',
     data(){
+        let validatePw=(rule,value,callback)=>{
+            if(this.rPw!=this.accountInfo.newPw)
+                callback(new Error('两次输入密码不一致!'));
+            else callback();
+        }
         return{
             accountInfo:{
                 id:'',
-                pw:'',
+                password:'',
                 mail:'',
                 newPw:'',
-                rPw:'',
             },
-            userInfo:[],
-            userID:this.$route.params.id
+            rPw:'',
+            userInfo:{
+                'icon':localStorage['userIcon']
+            },
+            userID:this.$route.params.id,
+            rules: {
+                rPw:[{required: true, validator: validatePw, trigger: 'blur'}],
+                password:[{required: true, message: '请输入密码', trigger: 'blur'}],
+                newPw: [
+                    { required: true, message: '请输入密码', trigger: 'blur' },
+                    { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+                ],
+            }
         }
     },
     mounted(){
@@ -94,7 +109,6 @@ export default {
             this.$emit('back');
         },
         geturl(url){
-            if(url!=undefined)
             return imgHost+url;
         },
         getUserInfo(){
@@ -167,19 +181,23 @@ export default {
             })
         },
         submit2(){
-            this.axios({
-				url:apiHost+"/changePwd?oldPwd="+md5(this.accountInfo.pw)+"&newPwd="+md5(this.accountInfo.newPw),
-				method:'post'
-			}).then(res=>{
-				if(res.data.code==200){
-                    this.$router.go(-1);
-                    this.$notify({
-                        title:'修改成功',
-                        type:'success'
-                    })
-                }
-			})
+            if(this.rPw==this.accountInfo.newPw){
+                this.axios({
+                    url:apiHost+"/changePwd?oldPwd="+md5(this.accountInfo.password)+"&newPwd="+md5(this.accountInfo.newPw),
+                    method:'post'
+                }).then(res=>{
+                    if(res.data.code==200){
+                        this.$router.go(-1);
+                        this.$notify({
+                            title:'修改成功',
+                            type:'success'
+                        })
+                    }
+                })
+            }
         }
+    },
+    watch:{
     }
 }
 </script>

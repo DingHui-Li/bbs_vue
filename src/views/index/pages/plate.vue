@@ -9,7 +9,7 @@
                                     <div style="font-size:1.2rem;padding-left:10px;font-weight:bold;color:#fff;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;" >{{plate.plate_name}}</div>
                                     <span style="margin-left:10px;font-weight:bold;color:#fff;"> ({{plate.districtInfos.length}}-{{plate.post_num}})</span>
                             </template>
-                            <div v-for="dist in plate.districtInfos" :key="dist.name" style="background:none;color:#fff;margin-bottom:10px" 
+                            <div v-for="dist in plate.districtInfos" :key="dist.name" style="background:none;color:#fff;margin-bottom:10px;cursor:pointer" 
                                 @click="changeDist(dist.plate_id,dist.id,plate.plate_name,dist.name)"> 
                                 <el-card style="color:#757575;">
                                     <div style="font-size:1.2rem;font-weight:bold"> {{dist.district_name}}</div>
@@ -26,7 +26,7 @@
                 </el-aside>
                 <el-aside></el-aside>
                 <el-main>
-                    <el-card style="box-shadow:none;border:none">
+                    <el-card style="box-shadow:none;border:none;background-color:#e0e0e0;">
                         <div style="font-size:2.5rem;color:#757575" slot="header">
                             <div style="float:left;padding-right:20px;margin-right:20px;border-right:1px solid #ccc">
                                 {{actDistrictName}}
@@ -45,7 +45,7 @@
                             </div> 
                         </div>
                         <div>
-                            <el-card style="border-radius:20px;border:2px solid #6699FF;padding-bottom:10px" v-if="totalNotice.userInfo!=undefined">
+                            <el-card style="border-radius:20px;padding-bottom:10px;" v-if="totalNotice.userInfo!=undefined">
                                     <div>
                                         <div style="width:30px;float:left;margin-right:5px"  @click="$router.push(`/person/${totalNotice.userInfo.id}`)">
                                             <el-image :src='geturl(totalNotice.userInfo.icon)' style="width:30px;height:30px;border-radius:50%"></el-image>
@@ -64,7 +64,7 @@
                                         </span>
                                     </el-col>
                             </el-card>
-                            <el-card style="border-radius:20px;border:2px solid #6699FF;padding-bottom:10px;margin:5px 0" v-if="plateNotice.userInfo!=undefined">
+                            <el-card style="border-radius:20px;padding-bottom:10px;margin:5px 0;" v-if="plateNotice.userInfo!=undefined">
                                     <div>
                                         <div style="width:30px;float:left;margin-right:5px"  @click="$router.push(`/person/${plateNotice.userInfo.id}`)">
                                             <el-image :src='geturl(plateNotice.userInfo.icon)' style="width:30px;height:30px;border-radius:50%"></el-image>
@@ -83,7 +83,7 @@
                                         </span>
                                     </el-col>
                             </el-card>
-                            <el-card style="border-radius:20px;border:2px solid #6699FF;padding-bottom:10px" v-if="districtNotice.userInfo!=undefined">
+                            <el-card style="border-radius:20px;padding-bottom:10px;" v-if="districtNotice.userInfo!=undefined">
                                     <div>
                                         <div style="width:30px;float:left;margin-right:5px"  @click="$router.push(`/person/${districtNotice.userInfo.id}`)">
                                             <el-image :src='geturl(districtNotice.userInfo.icon)' style="width:30px;height:30px;border-radius:50%"></el-image>
@@ -103,7 +103,7 @@
                                     </el-col>
                             </el-card>
                         </div>
-                        <el-tabs value="all">
+                        <el-tabs v-model="selectTab" style="margin-top:20px">
                             <el-tab-pane label="全部" name="all">
                                 <el-col style="margin:20px 0" align="end">
                                     帖子排序：
@@ -114,12 +114,16 @@
                                         <el-radio-button label="浏览量"></el-radio-button>
                                     </el-radio-group>
                                 </el-col>
-                                <el-col style="padding:0">
-                                    <post v-for="post in posts" :key="'post'+post.id" :data='post'></post>
+                                <el-col style="padding:0" id="postContainer"  >
+                                    <post v-for="post in posts" :key="'posts'+post.id+'-'+post.view_num" :data='post' 
+                                        @postLoadComplete="postLoadComplete" className="posts" parent="postContainer" :length="posts.length"></post>
                                 </el-col>
                             </el-tab-pane>
-                            <el-tab-pane label="精品" name="quality">
-                                <post v-for="post in qualityPost" :key="'qualitypost'+post.id" :data='post'></post>
+                            <el-tab-pane label="精华" name="quality">
+                                <post-horizontal v-for="post in qualityPost" :key="'qualitypost'+post.id" :data='post'></post-horizontal>
+                                <!-- <el-col align='center'>
+                                    <el-button @click="getQuality">加载更多</el-button>
+                                </el-col>  -->
                             </el-tab-pane>
                         </el-tabs>
                     </el-card>
@@ -133,26 +137,39 @@
 import { apiHost, imgHost } from '../../../../apiConfig';
 import notice from '../components/notice'
 import post from '../components/post'
+import post_horizontal from '../components/post_horizontal'
 import fab from '../components/fab'
 export default {
-    components:{notice,post,fab},
+    components:{notice,post,'post-horizontal':post_horizontal,fab},
     data(){
         return{
-            plates:[],
-            actDistrict:-1,
-            actDistrictName:'',
-            actPlateName:'',
+            selectTab:'all',//选中的选项卡
+            plates:[],//分区数据
+            actDistrict:-1,//当前分区id
+            actDistrictName:'',//当前分区名
+            actPlateName:'',//当前板块名
             totalNotice:[],
             plateNotice:[],
             districtNotice:[],
             sort:"最新发布",
             posts:[],
-            qualityPost:[]
+            qualityPost:[],
+            postNum:0,
+            pageNum:1,
+            qualityPageNum:1,
+            qualityPageMsg:'加载更多'
         }
     },
     mounted(){
         this.getPlate();
         this.getNotice(-1,-1);
+        window.onscroll = ()=>{
+            if(this.selectTab=='all'){
+                if(this.checkBottom()){
+                    this.getDistPost();
+                }
+            }
+        }
     },
     methods:{
         getPlate(){
@@ -165,21 +182,26 @@ export default {
                     this.getNotice(this.plates[0].id,-1);
                     this.getNotice(-1,this.plates[0].districtInfos[0].id);
                     this.actDistrict=this.plates[0].districtInfos[0].id;
+                    this.pageNum=1;
                     this.getDistPost();
                     this.getQuality();
                     this.actDistrictName=this.plates[0].districtInfos[0].district_name;
                     this.actPlateName=this.plates[0].plate_name;
                 }
-                console.log(this.plates)
+                
             })
         },
         getDistPost(){
                 this.axios({
-                    url:apiHost+"/anon/post/getPostTitles?id="+this.actDistrict+"&orderby="+this.getSortType(this.sort),
+                    url:apiHost+"/anon/post/getPostTitles?id="+this.actDistrict+"&orderby="+this.getSortType(this.sort)+'&page='+this.pageNum,
                     method:'get'
                 }).then(res=>{
                     if(res.data.code==200){
-                        this.posts=res.data.postInfos;
+                        this.pageNum++;
+                        console.log(res)
+                        for(let i=0;i<res.data.postInfos.length;i++){
+                            this.posts.push(res.data.postInfos[i])
+                        }
                     }
             })    
         },
@@ -200,15 +222,18 @@ export default {
                 }
             })
         },
-        changeDist(plate_id,district_id,plate_name,district_name){
-            // this.actDistrictName=district_name;
-            // this.actPlateName=plate_name;
+        changeDist(plate_id,district_id,plate_name,district_name){//分区改变-重新加载
             this.actDistrict=district_id;
+            this.pageNum=1;
+            this.qualityPageNum=1;
+            this.posts=[];
+            this.postNum=0;
             this.getDistPost();
             this.getQuality();
             this.getNotice(plate_id,-1);
             this.getNotice(-1,district_id);
             this.getPlateNameANDDistrictName();
+            
         },
         geturl(url){
             return imgHost+url;
@@ -217,7 +242,10 @@ export default {
 			let d=new Date(date);
 			return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getUTCDate()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
         },
-        sortChange(){
+        sortChange(){//排列方式改变-重新加载
+            this.pageNum=1;
+            this.posts=[];
+            this.postNum=0;
             this.getDistPost();
         },
         getSortType(label){
@@ -246,6 +274,49 @@ export default {
                     this.qualityPost=res.data.recomdTitles;
                 }
             })
+        },
+        postLoadComplete(className,length,parent){
+            this.postNum++;
+            if(this.postNum==length){//等待所有图片加载完成
+                this.setPosition(parent,className)
+            }
+        },
+
+        setPosition(container,item){
+            let boxs=document.getElementsByClassName(item);
+            if(boxs.length>0){
+                let box=boxs[0];
+                let window_width=document.getElementById(container).offsetWidth;
+                let num=Math.round(window_width/box.offsetWidth);
+                let boxHeight=[];
+                for(let i =0;i<boxs.length;i++){
+                    if(i<num){//第一行
+                        boxHeight.push(boxs[i].offsetHeight+80);
+                    }else{
+                        boxs[i].style.position='absolute';
+                        let minHeight=Math.min.apply(null,boxHeight);
+                        let minIndex=this.getMinHeightIndex(boxHeight,minHeight);
+                        boxs[i].style.top=minHeight+'px';//设置top
+                        boxs[i].style.left=boxs[minIndex].offsetLeft+'px';//设置left
+                        boxHeight[minIndex]+=boxs[i].offsetHeight;//更新数组
+                    }
+                }
+                document.getElementById(container).style.height=Math.max.apply(null,boxHeight)+'px';
+            }
+        },
+        getMinHeightIndex(imgHeight,minHeight){
+            for(let i=0;i<imgHeight.length;i++){
+                if(imgHeight[i]==minHeight) return i;
+            }
+        },
+        checkBottom(){
+       		var scrollTop = document.documentElement.scrollTop||document.body.scrollTop;
+       		var windowHeight = document.documentElement.clientHeight || document.body.clientHeight;
+       		var scrollHeight = document.documentElement.scrollHeight||document.body.scrollHeight;
+             if(scrollTop+windowHeight==scrollHeight){
+         	      return true;
+             }  
+            return false;
         }
     }
 }
