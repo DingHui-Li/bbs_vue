@@ -118,6 +118,7 @@
                                     <post v-for="post in posts" :key="'posts'+post.id+'-'+post.view_num" :data='post' 
                                         @postLoadComplete="postLoadComplete" className="posts" parent="postContainer" :length="posts.length"></post>
                                 </el-col>
+                                <el-col align="center" style="font-size:0.9rem;color:#757575;border-top:1px solid #ccc;padding:20px 0">{{msg}}</el-col>
                             </el-tab-pane>
                             <el-tab-pane label="精华" name="quality">
                                 <post-horizontal v-for="post in qualityPost" :key="'qualitypost'+post.id" :data='post'></post-horizontal>
@@ -156,22 +157,32 @@ export default {
             qualityPost:[],
             postNum:0,
             pageNum:1,
-            qualityPageNum:1,
-            qualityPageMsg:'加载更多'
+            msg:'加载更多'
         }
     },
     mounted(){
         this.getPlate();
         this.getNotice(-1,-1);
-        window.onscroll = ()=>{
-            if(this.selectTab=='all'){
-                if(this.checkBottom()){
-                    this.getDistPost();
-                }
-            }
-        }
+    },
+    beforeRouteEnter(to,from,next){
+        next(vm=>{
+            window.addEventListener('scroll',vm.scrollListener)
+        })
+    },
+    beforeRouteLeave (to, from, next) {
+        window.removeEventListener('scroll',this.scrollListener);
+        next();
     },
     methods:{
+        scrollListener(){
+            if(this.posts.length!=0){
+                if(this.selectTab=='all'){
+                    if(this.checkBottom()){
+                        this.getDistPost();
+                    }
+                }
+            }
+        },
         getPlate(){
             this.axios({
                 url:apiHost+"/anon/plate/getPlates",
@@ -192,16 +203,24 @@ export default {
             })
         },
         getDistPost(){
+                this.msg="加载中...";
                 this.axios({
-                    url:apiHost+"/anon/post/getPostTitles?id="+this.actDistrict+"&orderby="+this.getSortType(this.sort)+'&page='+this.pageNum,
+                    url:apiHost+"/anon/post/getPostTitles?size=20&id="+this.actDistrict+"&orderby="+this.getSortType(this.sort)+'&page='+this.pageNum,
                     method:'get'
                 }).then(res=>{
                     if(res.data.code==200){
                         this.pageNum++;
-                        console.log(res)
+                        if(res.data.postInfos.length==0){
+                            this.msg="你找到了我的底线";
+                            return;
+                        }
+                        this.msg="下拉加载更多"
                         for(let i=0;i<res.data.postInfos.length;i++){
                             this.posts.push(res.data.postInfos[i])
                         }
+                    }
+                    else{
+                        this.msg="加载失败"
                     }
             })    
         },

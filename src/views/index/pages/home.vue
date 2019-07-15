@@ -11,7 +11,7 @@
                         <el-col align="center" style="font-size:0.9rem;color:#757575;border-top:1px solid #ccc;padding:20px 0">{{homePageMsg}}</el-col>
                     </el-tab-pane>
                     <el-tab-pane v-for="(plate,index) in filterplates" :key="'tab_'+plate.plate_name" :label="plate.plate_name" :name="index+''">
-                        <el-tabs stretch style="padding:0;" @tab-click="handleClick" v-model="actDistrict" id="district_pane">
+                        <el-tabs stretch style="padding:0;" @tab-click="handleClick" v-model="actDistrict" id="districtTab">
                             <el-tab-pane v-for="(district) in plate.districtInfos" :key="'tab_'+district.district_name" :label="district.district_name" :name="district.id+''">
                             </el-tab-pane>
                         </el-tabs>
@@ -71,17 +71,25 @@ export default {
             homePageMsg:'下拉加载更多'
         }   
     },
+    created(){
+        console.log('create')
+    },
     mounted(){
+        this.postNum=0;
+        this.homeData=[];
+        console.log('moumnted')
         this.getPlate();
         this.getHomeData();
         this.getNotice(-1,-1);
-        window.onscroll = ()=>{
-            if(this.selectTab=='发现'){
-                if(this.checkBottom()){
-                    this.getHomeData();
-                }
-            }
-        }
+    },
+    beforeRouteEnter(to,from,next){
+        next(vm=>{
+            window.addEventListener('scroll',vm.scrollListener)
+        })
+    },
+    beforeRouteLeave (to, from, next) {
+        window.removeEventListener('scroll',this.scrollListener);
+        next();
     },
     computed:{
         filterplates(){
@@ -94,6 +102,23 @@ export default {
         }
     },
     methods:{
+        toTop(){
+            var currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            if (currentScroll > 0) {
+                window.requestAnimationFrame(this.toTop);
+                window.scrollTo (0,currentScroll - (currentScroll/5));
+            }
+        },
+        scrollListener(){
+            if(this.homeData.length!=0){
+                if(this.selectTab=='发现'){
+                    if(this.checkBottom()){
+                        console.log('底部')
+                        this.getHomeData();
+                    }
+                }
+            }
+        },
         getPlate(){
             const loading=this.loading('tabCard');
             this.axios({
@@ -124,23 +149,25 @@ export default {
             this.getNotice(-1, this.actDistrict);
         },
         getHomeData(){
-            this.homePageMsg="加载中..."
+            this.homePageMsg="加载中...";
+            if(this.postNum==0) this.homeData=[];
             this.axios({
-                url:apiHost+'/anon/post/getIndexPostTitles?page='+this.homePageNum,
+                url:apiHost+'/anon/post/getIndexPostTitles?size=20&page='+this.homePageNum,
                 method:'get'
             }).then(res=>{
-                console.log(res)
                 if(res.data.code==200){
+                    console.log(this.homePageNum)
                     this.homePageNum++;
                     if(res.data.PostTitleList.length==0){
-                        this.homePageMsg='你发现了我的底线';
+                        this.homePageMsg='你找到了我的底线';
                         return;
                     }
+                    this.homePageMsg="下拉加载更多"
                     for(let i=0;i<res.data.PostTitleList.length;i++){
                         this.homeData.push(res.data.PostTitleList[i])
                     }
                 }else{
-                    this.$message.error('加载失败');
+                    this.homePageMsg="加载失败";
                 }
             })
         },
@@ -157,7 +184,7 @@ export default {
             this.distPageMsg='加载更多'
             let loading=this.loading('district_pane');
                 this.axios({
-                    url:apiHost+"/anon/post/getPostTitles?id="+this.actDistrict+"&orderby="+this.getSortType(this.sort)+'&page='+this.distPageNum,
+                    url:apiHost+"/anon/post/getPostTitles?size=20&id="+this.actDistrict+"&orderby="+this.getSortType(this.sort)+'&page='+this.distPageNum,
                     method:'get'
                 }).then(res=>{
                     loading.close();
@@ -171,6 +198,7 @@ export default {
                             this.posts.push(res.data.postInfos[i]);
                         }
                     }
+                    console.log(this.posts)
             })    
         },
         getSortType(label){
@@ -264,10 +292,18 @@ export default {
     #plateTab .el-tabs__item{
         font-size: 1.5rem;
         font-weight: bold;
-        color:#757575;
+        color:#fff;
         margin-top:20px
     }
-    #district_pane .el-tabs__item{
+    #plateTab .el-tabs__header{
+        background: linear-gradient(left,rgb(155, 123, 243,0.5),rgb(78, 160, 243,0.5));
+        color:#fff;
+    }
+    #districtTab .el-tabs__header{
+        background: #fff;
+        color:#757575;
+    }
+    #districtTab .el-tabs__item{
         font-size: 1.2rem;
         font-weight: bold;
         color:#757575;

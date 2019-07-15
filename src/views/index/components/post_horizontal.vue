@@ -1,5 +1,5 @@
 <template>
-    <el-card class="post_horizontal animated fadeInUp" :id="'post_horizontal'+data.post_title_id" :body-style="{padding:'0px'}" 
+    <el-card class="post_horizontal animated fadeInUp" :body-style="{padding:'0px'}" 
             style="border-radius:10px;margin:10px 0;cursor:pointer;animation-duration:.5s">
         <el-image :src="geturl(data.image)"
             style="width:150px;height:150px;float:left" fit="cover" @click="postClick">
@@ -63,13 +63,6 @@ export default {
             return imgHost+url;
         },
         mark(){
-            const loading = this.$loading({
-                lock: true,
-                target:document.getElementById('post_horizontal'+this.data.post_title_id),
-                text: '操作中...',
-                spinner: 'el-icon-loading',
-                background: 'rgba(0, 0, 0, 0.7)'
-            });
             let id=-1;
             if(this.type=="mark") id=this.data.post_title_id;
             else id=this.data.id;
@@ -77,8 +70,6 @@ export default {
                 url:apiHost+'/anon/post/collect?post_title_id='+id,
                 method:'get'
             }).then(res=>{
-                loading.close();
-                console.log(res)
                 if(res.data.code==200){
                     if(this.data.collected){
                         this.data.recommend_num-=1;
@@ -91,20 +82,13 @@ export default {
             })
         },
         like(){
-            const loading = this.$loading({
-                lock: true,
-                target:document.getElementById('markPost'+this.data.post_title_id),
-                text: 'loading...',
-                spinner: 'el-icon-loading',
-                background: 'rgba(0, 0, 0, 0.7)'
-            });
+            let id=-1;
             if(this.type=="mark") id=this.data.post_title_id;
             else id=this.data.id;
             this.axios({
                 url:apiHost+'/anon/post/like?post_title_id='+id,
                 method:'get'
             }).then(res=>{ 
-                loading.close();
                 if(res.data.code==200){
                     if(this.data.liked){
                         this.data.like_num-=1;
