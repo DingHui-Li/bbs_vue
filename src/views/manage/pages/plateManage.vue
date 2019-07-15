@@ -20,12 +20,6 @@
 export default {
 	data(){
 		return{
-			countData:[
-				{'name':'今日发帖数','num':12,'time':'2019-7-14 16:49','color':'#2196F3'},
-				{'name':'今日发帖数','num':1123,'time':'2019-7-14 16:49','color':'#607D8B'},
-				{'name':'今日发帖数','num':143,'time':'2019-7-14 16:49','color':'#536DFE'},
-				{'name':'今日发帖数','num':231,'time':'2019-7-14 16:49','color':'#4CAF50'},
-			]
 		}
 	}
 }

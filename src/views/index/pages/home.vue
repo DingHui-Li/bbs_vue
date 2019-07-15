@@ -10,14 +10,15 @@
                         </el-col>
                         <el-col align="center" style="font-size:0.9rem;color:#757575;border-top:1px solid #ccc;padding:20px 0">{{homePageMsg}}</el-col>
                     </el-tab-pane>
-                    <el-tab-pane v-for="(plate,index) in plates" :key="'tab_'+plate.plate_name" :label="plate.plate_name" :name="index+''">
+                    <el-tab-pane v-for="(plate,index) in filterplates" :key="'tab_'+plate.plate_name" :label="plate.plate_name" :name="index+''">
                         <el-tabs stretch style="padding:0;" @tab-click="handleClick" v-model="actDistrict" id="district_pane">
                             <el-tab-pane v-for="(district) in plate.districtInfos" :key="'tab_'+district.district_name" :label="district.district_name" :name="district.id+''">
                             </el-tab-pane>
                         </el-tabs>
                     </el-tab-pane>
+                    <!-- <el-tab-pane label="更多板块" name='more'></el-tab-pane> -->
                 </el-tabs>
-                <el-row type="flex" justify="center" v-if="selectTab!='发现'">
+                <el-row type="flex" justify="center" v-if="selectTab!='发现'&&selectTab!='more'">
                     <el-col :lg="18">
                         <notice :data="totalNotice" type="total" />
                         <notice :data="plateNotice" type="plate" style="margin:5px 0"/>
@@ -67,7 +68,7 @@ export default {
             homePageNum:1,
             distPageNum:1,
             distPageMsg:'加载更多',
-            homePageMsg:'加载中...'
+            homePageMsg:'下拉加载更多'
         }   
     },
     mounted(){
@@ -80,6 +81,16 @@ export default {
                     this.getHomeData();
                 }
             }
+        }
+    },
+    computed:{
+        filterplates(){
+            let data= this.plates.map((item,index)=>{
+                if(index<4) return item;
+                return [];
+            })
+            data.splice(4,1);
+            return data;
         }
     },
     methods:{
@@ -96,12 +107,15 @@ export default {
             })
         },
         plateChange(tab,event){//父选项卡改变事件//分区改变-重新加载
-            if(tab.name!='发现'){
+            if(tab.name!='发现'&&tab.name!='more'){
                 this.actDistrict=this.plates[tab.name].districtInfos[0].id+'';
                 this.plateNotice=[];
                 this.districtNotice=[];
                 this.getNotice(this.plates[tab.name].id,-1);
                 this.getNotice(-1, this.actDistrict);
+            }
+            if(tab.name=='more'){
+                this.$router.push('/plate');
             }
         },
         handleClick(tab, event) {//子选项卡改变事件
@@ -110,19 +124,23 @@ export default {
             this.getNotice(-1, this.actDistrict);
         },
         getHomeData(){
+            this.homePageMsg="加载中..."
             this.axios({
                 url:apiHost+'/anon/post/getIndexPostTitles?page='+this.homePageNum,
                 method:'get'
             }).then(res=>{
+                console.log(res)
                 if(res.data.code==200){
+                    this.homePageNum++;
                     if(res.data.PostTitleList.length==0){
-                        this.homePageMsg='没有更多了';
+                        this.homePageMsg='你发现了我的底线';
                         return;
                     }
-                    this.homePageNum++;
                     for(let i=0;i<res.data.PostTitleList.length;i++){
                         this.homeData.push(res.data.PostTitleList[i])
                     }
+                }else{
+                    this.$message.error('加载失败');
                 }
             })
         },
@@ -222,7 +240,7 @@ export default {
        		 var scrollTop = document.documentElement.scrollTop||document.body.scrollTop;
        		 var windowHeight = document.documentElement.clientHeight || document.body.clientHeight;
        		 var scrollHeight = document.documentElement.scrollHeight||document.body.scrollHeight;
-             if(scrollTop+windowHeight==scrollHeight){
+             if(scrollTop+windowHeight+1>scrollHeight){
          	      return true;
              }  
             return false;

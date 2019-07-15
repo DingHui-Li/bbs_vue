@@ -2,8 +2,8 @@
     <el-row type="flex" justify="center" :gutter="20">
         <el-col style="padding:0" id="plate">
             <el-container>
-                <el-aside style="position:fixed;">
-                    <el-collapse  accordion style="padding:20px;">
+                <el-aside style="position:fixed;top:0">
+                    <el-collapse  accordion style="padding:20px;padding-top:100px">
                         <el-collapse-item v-for="plate in plates" :key="'plate'+plate.id" :name="plate.plate_name">
                             <template slot="title">
                                     <div style="font-size:1.2rem;padding-left:10px;font-weight:bold;color:#fff;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;" >{{plate.plate_name}}</div>
@@ -313,7 +313,7 @@ export default {
        		var scrollTop = document.documentElement.scrollTop||document.body.scrollTop;
        		var windowHeight = document.documentElement.clientHeight || document.body.clientHeight;
        		var scrollHeight = document.documentElement.scrollHeight||document.body.scrollHeight;
-             if(scrollTop+windowHeight==scrollHeight){
+             if(scrollTop+windowHeight+1>scrollHeight){
          	      return true;
              }  
             return false;

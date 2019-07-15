@@ -1,7 +1,7 @@
 <template>
     <el-row type="flex" justify="center" :gutter="20">
         <el-col :xl="14" :lg='16' :md='20' :xs='24' style="padding:5px" id="contentCard">
-            <el-image id="cover" style="width:100%;height:300px;border-radius:5px" :src="geturl(postData.image)" fit="cover" class="animated fadeInDown">
+            <el-image id="cover" style="width:100%;height:300px;border-radius:5px" :src="geturl(postData.image)" fit="cover" class="animated fadeInDown" v-if="postData.image!=undefined">
                 <div slot="error" class="image-slot" align="center">
                     <i class="el-icon-picture-outline" style="font-size:100px"></i>
                 </div>
@@ -14,7 +14,7 @@
                     <el-card style="border-radius:5px;padding:10px;box-shadow:none"  class="animated fadeInDown">
                         <div slot="header" style="font-weight:bold;color:#757575;">作者</div>
                         <div style="width:60px;float:left;" @click="$router.push(`/person/${userData.user_id}`)">
-                            <el-image  :src="geturl(userData.icon)" style="border-radius:50%;width:60px;height:60px" fit="cover"></el-image>
+                            <el-image  :src="geturl(userData.icon)" style="border-radius:50%;width:60px;height:60px" fit="cover" v-if="userData.icon!=undefined"></el-image>
                         </div>
                         <div style="margin-left:80px;cursor:pointer" @click="$router.push(`/person/${userData.user_id}`)">
                             <div style="font-weight:bold;margin-top:5px">{{userData.nick_name}}</div>

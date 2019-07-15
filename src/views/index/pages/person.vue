@@ -4,7 +4,7 @@
 			<div v-if="!isModify" class="animated fadeIn" style="animation-duration:1s">
 				<el-card style="padding:10px 0;box-shadow:none" >
 					<el-col :span="8" id="avatar" :xs="24" align="center">
-						<el-image  :src="geturl(userInfo.icon)"  style="width:200px;height:200px;border-radius:50%" fit="cover" >
+						<el-image  :src="geturl(userInfo.icon)"  style="width:200px;height:200px;border-radius:50%" fit="cover" v-if="userInfo.icon!=undefined">
 							<div slot="placeholder" class="image-slot" align="center">
 								<li class="el-icon-loading"></li>
 							</div>

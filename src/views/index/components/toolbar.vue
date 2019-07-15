@@ -4,7 +4,7 @@
             <keep-alive>
                 <el-menu mode="horizontal" :default-active="active" style="float:right;background:none;" id="menu">
                     <el-menu-item class="hidden-sm-and-down">
-                        <img :src="require('../../../assets/logo.png')" style="width:50px">
+                        <img :src="require('../../../assets/logo.png')" style="width:50px" @click="$router.push('/home')">
                     </el-menu-item>
                     <el-menu-item class="hidden-md-and-up">
                         <i class="fa fa-bars" aria-hidden="true" @click="openSideNav" align="center"></i>
@@ -154,6 +154,7 @@ export default {
     watch:{
         $route:function(to,form){
             this.checkSession();
+            this.active=this.$route.path;
         }
     }
 }

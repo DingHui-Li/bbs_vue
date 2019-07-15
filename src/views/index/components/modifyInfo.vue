@@ -7,7 +7,7 @@
             <el-tab-pane label="修改个人资料">
                 <div style="float:left;width:200px">
                     <el-image :src="geturl(userInfo.icon)" 
-                        @click="uploadIcon()"
+                        @click="uploadIcon()" v-if="userInfo.icon!=undefined"
                         style="width:200px;height:200px;border-radius:50%">
                         <div slot="placeholder" class="image-slot" align="center">
 							<li class="el-icon-loading"></li>

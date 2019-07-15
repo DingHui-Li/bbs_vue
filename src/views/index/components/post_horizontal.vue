@@ -70,8 +70,11 @@ export default {
                 spinner: 'el-icon-loading',
                 background: 'rgba(0, 0, 0, 0.7)'
             });
+            let id=-1;
+            if(this.type=="mark") id=this.data.post_title_id;
+            else id=this.data.id;
             this.axios({
-                url:apiHost+'/anon/post/collect?post_title_id='+this.data.post_title_id,
+                url:apiHost+'/anon/post/collect?post_title_id='+id,
                 method:'get'
             }).then(res=>{
                 loading.close();
@@ -95,8 +98,10 @@ export default {
                 spinner: 'el-icon-loading',
                 background: 'rgba(0, 0, 0, 0.7)'
             });
+            if(this.type=="mark") id=this.data.post_title_id;
+            else id=this.data.id;
             this.axios({
-                url:apiHost+'/anon/post/like?post_title_id='+this.data.post_title_id,
+                url:apiHost+'/anon/post/like?post_title_id='+id,
                 method:'get'
             }).then(res=>{ 
                 loading.close();
