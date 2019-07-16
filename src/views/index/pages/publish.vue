@@ -2,7 +2,7 @@
     <el-row type="flex" justify="center" :gutter="20">
         <el-col :lg='14'  :md='18' :xs='24'>
             <el-card style="box-shadow:none;border:none;padding:10px" id="publishCard">
-                <div align="center" @click="uploadCover()">
+                <div align="center" @click="uploadCover()" id="cover">
                     <el-image id="cover" style="width:100%;height:200px;border-radius:5px" :src="geturl" fit="cover">
                         <div slot="error" class="image-slot" align="center">
                             <i class="el-icon-picture-outline" style="font-size:100px"></i>
@@ -82,21 +82,27 @@ export default {
 				'redo'  // 重复
 			];
 			const _this=this;
-			editor.customConfig.uploadImgMaxSize = 2 * 1024 * 1024;
+			editor.customConfig.uploadImgMaxSize = 3 * 1024 * 1024;
 			editor.customConfig.uploadImgMaxLength = 1;
 			editor.customConfig.customUploadImg=function(file,insert){
 				let formData =new FormData();
-				formData.append("file",file[0]);
-				formData.append("type","img")
+                formData.append("file",file[0]);
+                formData.append("type","img")
+                const loading = _this.$loading({
+                        lock: true,
+                        text: '上传中...',
+                        target:document.getElementById('text'),
+                        spinner: 'el-icon-loading',
+                        background: 'rgba(0, 0, 0, 0.7)'
+                    });
 				_this.axios({
 					method:'post',
                     url: imgHost+'/img/upload',
-                    // withCredentials: false,
 					data:formData,
 				}).then(function(res){
+                    loading.close();
 					if(res.data.code==200){
 						insert(imgHost+res.data.path)
-
 					}
 				})
 			}
@@ -112,21 +118,24 @@ export default {
                     let file=this.files[0];
                     data.append('type','cover');
                     data.append('file',file);
-                    if(file>( 2 * 1024 * 1024)){
-						alert("图片大小不要超过2M");
+                    if(file.size>( 4 * 1024 * 1024)){
+						alert("图片大小不要超过4M");
                         return;
                     }
-                    console.log(file)
-                    let width=file.size.width;
-                    let height=file.size.height;
-                    console.log(width+"asaaassssssssssssssss"+height)
+                    const loading = _this.$loading({
+                        lock: true,
+                        text: '上传中...',
+                        target:document.getElementById('cover'),
+                        spinner: 'el-icon-loading',
+                        background: 'rgba(0, 0, 0, 0.7)'
+                    });
                     _this.axios({
                         url:imgHost+"/img/upload",
                         method:'post',
                         data:data
                     }).then(res=>{
+                        loading.close();
                         if(res.data.code==200){
-
                             _this.cover=res.data.path;
                         }
                     })
@@ -184,7 +193,7 @@ export default {
                 }else{
                     this.$notify({
                         title: '失败',
-                        message:res.msg,
+                        message:res.data.msg,
                         type: 'error'
                     });
                 }

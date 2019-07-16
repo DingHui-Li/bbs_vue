@@ -61,7 +61,7 @@ Vue.use(VueRouter);
 Vue.use(vueAxios,axios);
 axios.defaults.withCredentials=true;
 axios.interceptors.request.use(request=>{
-	if(request.url=="http://lidh.top:8084/imgservice/img/upload"){
+	if(request.url.indexOf("imgservice/img/upload")!=-1){
 		request.withCredentials=false;
 	}
 	return request;},error=>{

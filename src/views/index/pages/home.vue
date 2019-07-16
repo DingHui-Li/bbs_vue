@@ -10,7 +10,7 @@
                         </el-col>
                         <el-col align="center" style="font-size:0.9rem;color:#757575;border-top:1px solid #ccc;padding:20px 0">{{homePageMsg}}</el-col>
                     </el-tab-pane>
-                    <el-tab-pane v-for="(plate,index) in filterplates" :key="'tab_'+plate.plate_name" :label="plate.plate_name" :name="index+''">
+                    <el-tab-pane v-for="(plate,index) in plates" :key="'tab_'+plate.plate_name" :label="plate.plate_name" :name="index+''">
                         <el-tabs stretch style="padding:0;" @tab-click="handleClick" v-model="actDistrict" id="districtTab">
                             <el-tab-pane v-for="(district) in plate.districtInfos" :key="'tab_'+district.district_name" :label="district.district_name" :name="district.id+''">
                             </el-tab-pane>
@@ -97,7 +97,8 @@ export default {
                 if(index<4) return item;
                 return [];
             })
-            data.splice(4,1);
+            // data.splice(4,1);
+            console.log(data)
             return data;
         }
     },
@@ -133,7 +134,12 @@ export default {
         },
         plateChange(tab,event){//父选项卡改变事件//分区改变-重新加载
             if(tab.name!='发现'&&tab.name!='more'){
-                this.actDistrict=this.plates[tab.name].districtInfos[0].id+'';
+                if(this.plates[tab.name].districtInfos.length>0){
+                    this.actDistrict=this.plates[tab.name].districtInfos[0].id+'';
+                }else{
+                    this.actDistrict='-1';
+                    this.posts=[];
+                }
                 this.plateNotice=[];
                 this.districtNotice=[];
                 this.getNotice(this.plates[tab.name].id,-1);
@@ -198,7 +204,6 @@ export default {
                             this.posts.push(res.data.postInfos[i]);
                         }
                     }
-                    console.log(this.posts)
             })    
         },
         getSortType(label){

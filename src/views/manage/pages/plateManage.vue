@@ -26,37 +26,73 @@
 				</div>
 				<div style="float:left;line-height:30px">{{moterator.nick_name}}</div>
 				<div style="line-height:30px;float:right;margin-right:10px;color:red;font-size:1.2rem">
-					<i class="fa fa-minus-circle" aria-hidden="true" @click="deltePlateModerator(moterator.id)"></i>
+					<i class="fa fa-minus-circle" aria-hidden="true" @click="deltePlateModerator(moterator.user_id)"></i>
+				</div>
+			</div>
+		</el-dialog>
+		<el-dialog :visible.sync="modifyDistrictDialog" title="修改分区">
+			<el-button style="width:100%;background-color:red;color:#fff;margin-bottom:20px" @click="deleteDistrict()">删除该分区</el-button>
+			<el-input v-model="modifyDistrictData.district_name" maxlength='10' show-word-limit>
+				<template slot="append">
+					<el-button style="background-color:#2196F3;color:#fff;" @click="modifyDistrict()">确认修改</el-button>
+				</template>
+			</el-input>
+			<div style="margin:20px 0 20px 0;font-weight:bold;color:#757575">
+				分区版主：
+				<div style="float:right;margin-right:15px;font-size:1.5rem;color:#4CAF50" @click="addPlateModerator">
+					<i class="fa fa-plus-circle" aria-hidden="true"></i> 
+				</div>
+			</div>
+			<div style="margin:10px 0;padding-bottom:10px;border:1px solid #e0e0e0;height:30px;padding:5px;border-radius:5px" 
+				v-for="moterator in modifyDistrictData.moderator" 
+				:key="'moderator'+moterator.id">
+				<div style="float:left;width:40px">
+					<el-image :src="geturl(moterator.icon)" style="width:30px;height:30px;border-radius:50%"></el-image>
+				</div>
+				<div style="float:left;line-height:30px">{{moterator.nick_name}}</div>
+				<div style="line-height:30px;float:right;margin-right:10px;color:red;font-size:1.2rem">
+					<i class="fa fa-minus-circle" aria-hidden="true" @click="deltePlateModerator(moterator.user_id)"></i>
 				</div>
 			</div>
 		</el-dialog>
 		<el-dialog :visible.sync="addPlateDialog" title="增加板块">
 			<el-input v-model="addPlateData.plate_name" maxlength='10' show-word-limit></el-input>
-			<el-button @click="addPlateDialog=false">取消</el-button>
-			<el-button @click="addPlate()" type="primary">确定</el-button>
+			<div style="margin-top:20px" align="right">
+				<el-button @click="addPlateDialog=false">取消</el-button>
+				<el-button @click="addPlate()" type="primary">确定</el-button>
+			</div>
 		</el-dialog>
 		<el-dialog :visible.sync="addDistrictDialog" title="增加分区">
 			<el-input v-model="addDistrictData.district_name" maxlength='10' show-word-limit></el-input>
-			<div>
+			<div style="margin-top:20px" align="right">
 				<el-button @click="addDistrictDialog=false">取消</el-button>
 			<el-button @click="addDist()" type="primary">确定</el-button>
 			</div>
 		</el-dialog>
+
 	</el-row>	
 </template>
 <script>
 import echarts from 'echarts'
+
 import { apiHost, imgHost } from '../../../../apiConfig';
 export default {
 	data(){
 		return{
 			plateData:[],
+			plateChart:null,
 			modifyPlateDialog:false,
+			modifyDistrictDialog:false,
 			addPlateDialog:false,
 			addDistrictDialog:false,
 			modifyPlateData:{
 				id:-1,
 				plate_name:'',
+				moderator:[]
+			},
+			modifyDistrictData:{
+				id:-1,
+				district_name:'',
 				moderator:[]
 			},
 			addPlateData:{
@@ -71,6 +107,7 @@ export default {
 	},
 	mounted(){
 		this.getPlateData();
+		this.init();
 	},
 	methods:{
 		geturl(url){
@@ -87,11 +124,15 @@ export default {
 						let children=plate.districtInfos.map(district=>{
 							return {'name':district.district_name,'value':district.post_num,'id':district.id,'type':'district'}
 						});
-						children.push({'name':'+','plate_id':plate.id,'type':'addDist'})
+						children.push({'name':'+','plate_id':plate.id,'type':'addDist',itemStyle:{color:'#4CAF50',borderColor:'none'},})
 						return {'name':plate.plate_name,'children':children,'id':plate.id,'type':'plate'}
 					});
-					this.plateData['children'].push({'name':'+','type':'addPlate'})
-					this.init();
+					this.plateData['children'].push({'name':'+','type':'addPlate',itemStyle:{color:'#4CAF50',borderColor:'none'},})
+					this.plateChart.setOption({
+						series: [{
+							data: [this.plateData]
+						}]
+					});
                 }
             })
 		},
@@ -102,11 +143,29 @@ export default {
 					method:'post'
 				}).then(res=>{
 					if(res.data.code==200){
+						this.getPlateData();
 						this.addPlateData.plate_name="";
 						this.addPlateDialog=false;
 						this.$notify({'title':'添加板块成功',type:"success"});
 					}else{
-						this.$notify.error('添加板块失败');
+						this.$notify.error(res.data.msg);
+					}
+				})
+			}
+		},
+		addDist(){
+			if(this.addDistrictData.district_name.trim().length>0){
+				this.axios({
+					url:apiHost+'/admin/addDistricts?plate_id='+this.addDistrictData.plate_id+'&district_name='+this.addDistrictData.district_name,
+					method:'post'
+				}).then(res=>{
+					if(res.data.code==200){
+						this.addDistrictDialog=false;
+						this.addDistrictData.district_name="";
+						this.$notify({'title':'添加分区成功',type:"success"});
+						this.getPlateData();
+					}else{
+						this.$notify.error('添加分区失败');
 					}
 				})
 			}
@@ -118,7 +177,16 @@ export default {
 			}).then(res=>{
 				if(res.data.code==200){
 					this.modifyPlateData.moderator=res.data.ls;
-					console.log(this.modifyPlateData)
+				}
+			})
+		},
+		getDistrictModerator(){
+			this.axios({
+				url:apiHost+'/admin/getDistrictModerator?district_id='+this.modifyDistrictData.id,
+				method:'get'
+			}).then(res=>{
+				if(res.data.code==200){
+					this.modifyDistrictData.moderator=res.data.ls;
 				}
 			})
 		},
@@ -135,6 +203,7 @@ export default {
 						data:{'user_id':value,'plate_id':this.modifyPlateData.id,'district_id':'-1'}
 					}).then(res=>{
 						if(res.data.code==200){
+							this.getModerator();
 							this.$notify({'title':'添加版主成功',type:"success"});
 						}else{
 							this.$notify.error(res.data.msg);
@@ -147,7 +216,12 @@ export default {
 				url:apiHost+'/admin/deletePlateModerator?user_id='+id,
 				method:'get'
 			}).then(res=>{
-				console.log(res);
+				if(res.data.code==200){
+					this.getModerator();
+					this.$notify({'title':'删除版主成功',type:"success"});
+				}else{
+					this.$notify.error(res.data.msg);
+				}
 			})
 		},
 		deletePlate(){
@@ -183,22 +257,6 @@ export default {
 				}
 			})
 		},
-		addDist(){
-			if(this.addDistrictData.district_name.trim().length>0){
-				this.axios({
-					url:apiHost+'/admin/addDistricts?plate_id='+this.addDistrictData.plate_id+'&district_name='+this.addDistrictData.district_name,
-					method:'post'
-				}).then(res=>{
-					if(res.data.code==200){
-						this.addDistrictData.district_name="";
-						this.$notify({'title':'添加分区成功',type:"success"});
-						this.getPlateData();
-					}else{
-						this.$notify.error('添加分区失败');
-					}
-				})
-			}
-		},
 		init(){
 			let charts=echarts.init(document.getElementById('plateChart'));
 			let option={
@@ -209,32 +267,28 @@ export default {
 					series: [
 						{
 							type: 'tree',
-							data:[this.plateData],
 							top: '1%',
 							left: '7%',
 							bottom: '1%',
 							right: '20%',
-							symbolSize: 7,
+							symbol:'circle',
+							symbolSize: 15,
 							label: {
-								normal: {
-									position: 'left',
-									verticalAlign: 'middle',
-									align: 'right',
-									fontSize: 15
-								}
+								color:'#455A64',
+								fontSize:'14',
+								position: 'right',
+							},
+							itemStyle:{
+								color:'#2196F3',
+								borderColor:'none'
 							},
 							leaves: {
-								label: {
-									normal: {
-										position: 'right',
-										verticalAlign: 'middle',
-										align: 'left'
-									}
-								}
+								itemStyle:{
+									color:'#FF5252',
+									borderColor:'none'
+								},
 							},
-							expandAndCollapse:false,
-							animationDuration: 550,
-							animationDurationUpdate: 750
+							expandAndCollapse:false
 						}
 					]
 				}
@@ -246,6 +300,12 @@ export default {
 					this.modifyPlateData.id=params.data.id;
 					this.getModerator();
 				}
+				else if(params.data.type=='district'){
+					this.modifyDistrictDialog=true;
+					this.modifyDistrictData.district_name=params.data.name;
+					this.modifyDistrictData.id=params.data.id;
+					this.getDistrictModerator();
+				}
 				else if(params.data.type=='addPlate'){
 					this.addPlateDialog=true;
 				}
@@ -254,6 +314,7 @@ export default {
 					this.addDistrictData.plate_id=params.data.plate_id;
 				}
 			})
+			this.plateChart=charts;
 		},
 	}
 }
