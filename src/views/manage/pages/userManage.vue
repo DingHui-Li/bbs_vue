@@ -9,16 +9,16 @@
 								搜索：{{searchTypeName}}
 							</span>
 							<el-dropdown-menu slot="dropdown">
-								<el-dropdown-item command="PostTitleInfo.id">账号</el-dropdown-item>
-								<el-dropdown-item command="title">邮箱</el-dropdown-item>
-								<el-dropdown-item command="content">昵称</el-dropdown-item>
+								<el-dropdown-item command="user_name">账号</el-dropdown-item>
+								<el-dropdown-item command="UserLoginInfo.id">id</el-dropdown-item>
+								<el-dropdown-item command="nick_name">昵称</el-dropdown-item>
 							</el-dropdown-menu>
 						</el-dropdown>
 					</template>
 				</el-input>
 			</el-col>
 			<el-col :xs="24" :lg="12" style="padding:10px">
-				<el-button type="primary" :style="{display:deleteBtn}" @click="deletePost">删除</el-button>
+				<el-button type="primary" :style="{display:deleteBtn}" @click="deleteUser">删除</el-button>
 			</el-col>
 			<el-table :data='userData' stripe  ref="multipleTable" @select="select">
 				<el-table-column type="selection"></el-table-column>
@@ -38,9 +38,19 @@
 				<el-table-column prop="mail" label="邮箱"></el-table-column>
 				<el-table-column label="账号状态">
 					<template slot-scope="scope">
-						<el-select :value="scope.row.state+''" @change="stateChange">
-							<el-option label="正常" value="1"></el-option>
-							<el-option label="禁止登录" value="0"></el-option>
+						<el-select v-model="scope.row.state" @change="stateChange($event,scope.row.id)">
+							<el-option label="正常" :value="1"></el-option>
+							<el-option label="禁止登录" :value="2"></el-option>
+						</el-select>
+					</template>
+				</el-table-column>
+				<el-table-column label="身份">
+					<template slot-scope="scope">
+						<el-select v-model="scope.row.role" @change="roleChange($event,scope.row.id)">
+							<el-option label="普通" :value="1"></el-option>
+							<el-option label="区主" :value="2"></el-option>
+							<el-option label="版主" :value="3"></el-option>
+							<el-option label="管理员" :value="4"></el-option>
 						</el-select>
 					</template>
 				</el-table-column>
@@ -58,8 +68,8 @@ export default {
 		return{
 			userData:[],//用户数据
 			serarchKey:'',
-			searchType:'PostTitleInfo.id',
-			searchTypeName:'昵称',
+			searchType:'UserLoginInfo.id',
+			searchTypeName:'ID',
 			selected:[],
 			deleteBtn:'none',
 			allPageNum:1,//总页数
@@ -103,39 +113,96 @@ export default {
             })
 		},
 		changeSearchType(command){
-			if(command=='PostTitleInfo.id') this.searchTypeName="ID"
-			else if(command=='title') this.searchTypeName="标题"
-			else if(command=='content') this.searchTypeName="内容"
-			else if(command=='nick_name') this.searchTypeName="用户昵称";
+			if(command=='userLoginInfo.id') this.searchTypeName="ID"
+			else if(command=='user_name') this.searchTypeName="账号"
+			else if(command=='nick_name') this.searchTypeName="昵称";
 			this.searchType=command;
-			this.serarch();
+			this.search();
 		},
 		search(){
 			if(this.serarchKey.trim().length>0){
 				this.axios({
-					url:apiHost+'/admin/searchByColum?colum_name='+this.searchType+'&s='+this.serarchKey,
+					url:apiHost+'/admin/searchUser?colum_name='+this.searchType+'&s='+this.serarchKey,
 					method:'get'
 				}).then(res=>{
-					this.loading=false;
+					console.log(res)
 					if(res.data.code==200){
-						this.postData=res.data.ls;
+						let temp=res.data.ls;
+						let data=[];
+						for(let i=0;i<temp.length;i++){
+							let row={};
+							for(let key in temp[i]){
+								if(key!='userBaseInfo'){
+									row[key]=temp[i][key];
+								}else{
+									for(key in temp[i].userBaseInfo){
+										if(key!='id')
+											row[key]=temp[i].userBaseInfo[key];
+									}
+								}
+							}
+							data.push(row);
+						}
+						this.userData=data;
 					}
 				})
 			}
 		},
 		select(){
-			this.selected=this.$refs.multipleTable.selection.map(item=>item.id);
+			this.selected=this.$refs.multipleTable.selection.map(item=>{
+				return {'id':item.id}
+			});
 		},
-		stateChange(val){
-			alert(val)
+		stateChange(val,id){
+			this.axios({
+				url:apiHost+'/admin/changeUserState?colum_name=state&user_id='+id+"&state="+val,
+				method:'post'
+			}).then(res=>{
+				if(res.data.code==200){
+					this.$notify({
+						title:'操作成功',
+						type:'success'
+					})
+				}else{
+					this.$notify.error("操作失败");
+				}
+			})
+		},
+		roleChange(value,id){
+			this.axios({
+				url:apiHost+'/admin/changeUserState?colum_name=role&user_id='+id+"&state="+value,
+				method:'post'
+			}).then(res=>{
+				if(res.data.code==200){
+					this.$notify({
+						title:'操作成功',
+						type:'success'
+					})
+				}else{
+					this.$notify.error("操作失败");
+				}
+			})
 		},
 		pageChange(page){
 			this.pageNum=page;
 			this.getData();
 		},
-		deletePost(){
+		deleteUser(){
 			if(this.selected.length>0){
-				
+				this.axios({
+					url:apiHost+'/admin/deleteUsers',
+					method:'post',
+					data:this.selected
+				}).then(res=>{
+					if(res.data.code==200){
+						this.$notify({
+							title:'删除成功',
+							type:'sucess'
+						})
+					}else{
+						this.$notify.error("删除失败");
+					}
+				})
 			}
 		},
 		dateFormat(date){

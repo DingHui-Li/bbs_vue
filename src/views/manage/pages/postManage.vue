@@ -25,12 +25,12 @@
 					element-loading-text="拼命加载中" element-loading-background="rgba(0, 0, 0, 0.8)">
 				<el-table-column type="selection"></el-table-column>
 				<el-table-column prop="id" label="ID"  align="center"></el-table-column>
-				<el-table-column prop="title" label="标题"  align="center">
+				<el-table-column prop="title" label="标题"  align="center" width="200px">
 					<template slot-scope="scope">
-						<span @click="selectPostid=scope.row.id;isContent=true" style="cursor:pointer">{{scope.row.title}}</span>
+						<u @click="selectPostid=scope.row.id;isContent=true" style="cursor:pointer;color:#2196F3">{{scope.row.title}}</u>
 					</template>
 				</el-table-column>
-				<el-table-column label="用户">
+				<el-table-column label="用户" width="200px">
 					<template slot-scope="scope">
 						<div style="float:left;width:35px">
 							<el-image :src="geturl(scope.row.icon)" style="height:30px;width:30px;border-radius:50%"></el-image>
@@ -44,10 +44,28 @@
 				<el-table-column prop="like_num" label="点赞量"  align="center"></el-table-column>
 				<el-table-column prop="recommend_num" label="收藏量"  align="center"></el-table-column>
 				<el-table-column prop="reply_num" label="评论数"  align="center"></el-table-column>
-				<el-table-column prop="state" label="帖子状态"  align="center"></el-table-column>
+				<el-table-column label="帖子状态"  align="center" width="120px">
+					<template slot-scope="scope">
+						<el-select v-model="scope.row.state" @change="stateChange($event,scope.row.id)">
+							<el-option label="正常" value="1"></el-option>
+							<el-option label="精品" value="4"></el-option>
+							<el-option label="置顶" value="5"></el-option>
+							<el-option label="加精置顶" value="6"></el-option>
+						</el-select>
+					</template>
+				</el-table-column>
+				<el-table-column label="分区" width="120px">
+					<template slot-scope="scope">
+						<el-cascader placeholder="请选择分区"
+                            :options="plateData" :show-all-levels='false'
+                            :value="[scope.row.plate_id,scope.row.plate_id+'-'+scope.row.districtInfo_id]"
+                            @change="selectPlate($event,scope.row.id)"  :props="{ expandTrigger: 'hover' }">
+						</el-cascader>
+					</template>
+				</el-table-column>
 				<el-table-column label="发帖时间"  align="center">
 					<template slot-scope="scope">
-						<span style="font-size:0.8rem">{{dateFormat(scope.row.post_time)}}</span>
+						<span style="font-size:0.7rem">{{dateFormat(scope.row.post_time)}}</span>
 					</template>
 				</el-table-column>
 			</el-table>
@@ -80,6 +98,8 @@ export default {
 	data(){
 		return{
 			postData:[],//帖子数据
+			plateData:[],//分区数据
+			selectedPlate:['1','1-1'],
 			serarchKey:'',//搜索关键字
 			searchType:'PostTitleInfo.id',//搜索类型
 			searchTypeName:'ID',//搜索类型名称
@@ -94,7 +114,7 @@ export default {
 	},
 	mounted(){
 		this.getData();
-		//this.test();
+		this.getPlateData();
 	},
 	computed:{
 		
@@ -143,7 +163,55 @@ export default {
 			else if(command=='content') this.searchTypeName="内容"
 			else if(command=='nick_name') this.searchTypeName="用户昵称";
 			this.searchType=command;
-			this.serarch();
+			this.search();
+		},
+		stateChange(state,id){
+			this.axios({
+				url:apiHost+'/admin/changePostState?colum_name=state&post_id='+id+'&state='+state ,
+				method:'post'
+			}).then(res=>{
+				if(res.data.code==200){
+					this.$notify({
+						title:'修改成功',
+						type:'success'
+					})
+				}else{
+					this.$notify.error('修改失败')
+				}
+			})
+		},
+		selectPlate(value,id){
+			let temp=value[1].split('-');
+            let districtId=temp[1];
+			this.axios({
+				url:apiHost+'/admin/changePostDis?colum_name=districtInfo_id&post_id='+id+'&dis_id='+districtId,
+				method:'post',
+			}).then(res=>{
+				if(res.data.code==200){
+					this.$notify({
+						title:'修改成功',
+						type:'success'
+					})
+				}else{
+					this.$notify.error('修改失败')
+				}
+			})
+		},
+		getPlateData(){
+            this.axios({
+                url:apiHost+"/anon/plate/getPlates",
+                method:"get"
+            }).then(res=>{
+                if(res!=undefined){
+                    this.plateData=res.data.map(plate=>{
+                        let children=plate.districtInfos.map(district=>{
+                            //父级value与子级value不能相同，所以给子级value前加上'父级id-',导致获取子级id时需要分割字符串
+                            return {'value':district.plate_id+'-'+district.id,'label':district.district_name};
+                        })
+                        return {'value':plate.id,'label':plate.plate_name,'children':children}
+                    })
+                }
+            })
 		},
 		search(){
 			let loading=this.$loading({

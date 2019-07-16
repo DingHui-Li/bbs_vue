@@ -47,6 +47,9 @@ import { apiHost,imgHost } from '../../../../apiConfig';
 export default {
     name:'ezpost',
     props:['data','isme'],
+    mounted(){
+       // console.log(this.data)
+    },
     methods:{
         postClick(id){
             this.$router.push(`/content/${id}`);
