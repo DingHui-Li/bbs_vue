@@ -54,10 +54,10 @@
 						</el-select>
 					</template>
 				</el-table-column>
-				<el-table-column label="分区" width="120px">
+				<el-table-column label="分区" width="150px">
 					<template slot-scope="scope">
 						<el-cascader placeholder="请选择分区"
-                            :options="plateData" :show-all-levels='false'
+                            :options="plateData" 
                             :value="[scope.row.plate_id,scope.row.plate_id+'-'+scope.row.districtInfo_id]"
                             @change="selectPlate($event,scope.row.id)"  :props="{ expandTrigger: 'hover' }">
 						</el-cascader>

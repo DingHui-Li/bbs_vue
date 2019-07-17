@@ -19,6 +19,7 @@ const userManage=()=>import('./pages/userManage')
 const postManage=()=>import('./pages/postManage')
 const plateManage=()=>import('./pages/plateManage')
 const noticeManage=()=>import('./pages/noticeManage')
+const homeToplate=()=>import('./pages/homeToPlate')
 
 const routes=[
 	{path:'/',component:toolbar,children:[
@@ -28,6 +29,7 @@ const routes=[
 		{path:'/postManage',component:postManage},
 		{path:'/plateManage',component:plateManage},
 		{path:'/noticeManage',component:noticeManage},
+		{path:'/homeToPlate',component:homeToplate},
 	]}
 ]
 const router=new VueRouter({routes})

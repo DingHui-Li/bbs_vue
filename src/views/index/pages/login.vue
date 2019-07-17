@@ -150,15 +150,11 @@ export default {
                     data:{'user_name':this.name,'password':md5(this.pw)}
                 }).then((res)=>{
                     loading1.close();
+                    console.log(res)
                     if(res.data.code==200){
                         this.loginDialog = false;
                         this.$emit('getUserInfo',res.data);
-                        
-                        localStorage['userinfo']=res.data;
-                        if(this.adminLogin){
-                                window.open('/manage')
-                                retrun;
-                        }
+                        localStorage['userId']=res.data.id;
                         this.$router.replace('/home');
                     }else{
                         this.$message.error(res.data.msg);

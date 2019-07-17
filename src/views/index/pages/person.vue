@@ -156,6 +156,8 @@ export default {
                 url:apiHost+'/checkSession',
                 method:'post',
             }).then(res=>{
+				// console.log(res.data.id)
+				// console.log(localStorage['userId'])
                 if(res.data.code==200){ 
 					if(res.data.id==localStorage['userId']&&res.data.id==this.userID) this.isme=true;
 					else this.isme=false;

@@ -2,13 +2,13 @@
 	<el-container>
 		<el-aside style="position:fixed;" id="toolbar" class="hidden-sm-and-down">
 			<el-menu style="background-color:#455A64;height:100vh;color:#fff" align="center">
-				<div style="width:100%;height:100px;margin-top:40px" align="center">
-					<div style="width:35px;background-color:red;display:inline-block">
+				<div style="width:100%;height:100px;margin-top:40px;border-bottom:1px solid #e0e0e0" align="center">
+					<div style="width:35px;">
 						<el-image :src="geturl(userInfo.userBaseInfo.icon)" style="height:30px;width:30px;border-radius:50%"></el-image>
 					</div>
-					<div style="float:left">{{userInfo.userBaseInfo.nick_name}}</div>
-					<div style="background-color:blue;display:inline-block;margin-top:-20px;position:relative">
-						
+					<span style="font-size:0.8rem ">{{userInfo.userBaseInfo.nick_name}}</span>
+					<div>
+						{{userInfo.roleInfos[0].name}}
 					</div>
 				</div>
 				<el-menu-item v-for="item in sideNav" :key="item.path" :index="item.path" @click="addTab(item.name,item.path)">
