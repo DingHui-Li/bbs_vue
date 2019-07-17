@@ -36,6 +36,8 @@ const router=new VueRouter({routes})
 Vue.use(ElementUI);
 Vue.use(VueRouter);
 Vue.use(vueAxios,axios);
+
+axios.defaults.withCredentials=true;
 new Vue({
 	router,
 	render: h => h(Manage),

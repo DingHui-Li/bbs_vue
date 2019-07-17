@@ -20,7 +20,7 @@
 			<el-col :xs="24" :lg="12" style="padding:10px">
 				<el-button type="primary" :style="{display:deleteBtn}" @click="deleteUser">删除</el-button>
 			</el-col>
-			<el-table :data='userData' stripe  ref="multipleTable" @select="select">
+			<el-table :data='userData' stripe  ref="multipleTable" @select="select" @select-all="select">
 				<el-table-column type="selection"></el-table-column>
 				<el-table-column prop="id" label="ID"></el-table-column>
 				<el-table-column prop="user_name" label="账号"></el-table-column>
@@ -46,12 +46,13 @@
 				</el-table-column>
 				<el-table-column label="身份">
 					<template slot-scope="scope">
-						<el-select v-model="scope.row.role" @change="roleChange($event,scope.row.id)">
+						{{scope.row.roleInfos[0].name}}
+						<!-- <el-select v-model="scope.row.roleInfos.code" @change="roleChange($event,scope.row.id)" disabled="">
 							<el-option label="普通" :value="1"></el-option>
 							<el-option label="区主" :value="2"></el-option>
 							<el-option label="版主" :value="3"></el-option>
 							<el-option label="管理员" :value="4"></el-option>
-						</el-select>
+						</el-select> -->
 					</template>
 				</el-table-column>
 			</el-table>
@@ -89,6 +90,7 @@ export default {
                 url:apiHost+'/admin/getUsers?&page='+this.pageNum,
                 method:'get'
             }).then(res=>{
+				console.log(res)
                 if(res.data.code==200){
 					this.allPageNum=Math.ceil(res.data.num/20);
 					let data=[];
@@ -107,7 +109,7 @@ export default {
 					}
 					this.userData=data;
                 }else{
-					this.$message.error('数据获取错误')
+					this.$message.error(res.data.msg)
 				}
 				
             })
@@ -168,21 +170,21 @@ export default {
 				}
 			})
 		},
-		roleChange(value,id){
-			this.axios({
-				url:apiHost+'/admin/changeUserState?colum_name=role&user_id='+id+"&state="+value,
-				method:'post'
-			}).then(res=>{
-				if(res.data.code==200){
-					this.$notify({
-						title:'操作成功',
-						type:'success'
-					})
-				}else{
-					this.$notify.error("操作失败");
-				}
-			})
-		},
+		// roleChange(value,id){
+		// 	this.axios({
+		// 		url:apiHost+'/admin/changeUserState?colum_name=role&user_id='+id+"&state="+value,
+		// 		method:'post'
+		// 	}).then(res=>{
+		// 		if(res.data.code==200){
+		// 			this.$notify({
+		// 				title:'操作成功',
+		// 				type:'success'
+		// 			})
+		// 		}else{
+		// 			this.$notify.error("操作失败");
+		// 		}
+		// 	})
+		// },
 		pageChange(page){
 			this.pageNum=page;
 			this.getData();

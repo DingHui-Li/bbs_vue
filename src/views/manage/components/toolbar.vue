@@ -2,25 +2,30 @@
 	<el-container>
 		<el-aside style="position:fixed;" id="toolbar" class="hidden-sm-and-down">
 			<el-menu style="background-color:#455A64;height:100vh;color:#fff" align="center">
+				<div style="width:100%;height:100px;margin-top:40px" align="center">
+					<div style="width:35px;background-color:red;display:inline-block">
+						<el-image :src="geturl(userInfo.userBaseInfo.icon)" style="height:30px;width:30px;border-radius:50%"></el-image>
+					</div>
+					<div style="float:left">{{userInfo.userBaseInfo.nick_name}}</div>
+					<div style="background-color:blue;display:inline-block;margin-top:-20px;position:relative">
+						
+					</div>
+				</div>
 				<el-menu-item v-for="item in sideNav" :key="item.path" :index="item.path" @click="addTab(item.name,item.path)">
 					{{item.name}}
 				</el-menu-item>
-				<!-- <el-submenu v-for="item in sideNav" :key="item.path" :index="item.path">
-					<template slot="title">{{item.name}}</template>
-					<el-menu-item v-for="sonitem in item.children" :key="sonitem.path" :index="sonitem.path" >{{sonitem.name}}</el-menu-item>
-				</el-submenu>	 -->
+				<el-menu-item @click="quit()">退出</el-menu-item>
 			</el-menu>	
 		</el-aside>	
 		<el-aside class="hidden-sm-and-down"></el-aside>
 		<el-main>
-			<!-- <el-tabs type="card" closable @tab-remove="removeTab" @tab-click="changeTab" v-model="selectTab">
-				<el-tab-pane v-for="(tab,index) in tabs" :key="'tab-'+index" :label="tab.name" :name="tab.path"></el-tab-pane>
-			</el-tabs> -->
 			<router-view></router-view>
 		</el-main>
 	</el-container>	
 </template>
 <script>
+import { apiHost, imgHost } from '../../../../apiConfig';
+import { userInfo } from 'os';
 export default {
 	data(){
 		return{
@@ -32,10 +37,20 @@ export default {
 				{'name':'板块管理','path':'/plateManage'},
 				{'name':'公告管理','path':'/noticeManage'},
 			],
-			tabs:[]
+			tabs:[],
+			userInfo:JSON.parse(localStorage['userInfo'])
 		}
 	},
+	updated(){
+		this.checkSession();
+	},
+	mounted(){
+		console.log(this.userInfo)
+	},
 	methods:{
+		geturl(url){
+			return imgHost+url;
+		},
 		addTab(name,path){
 			this.$router.replace(path);
 			this.selectTab=path;
@@ -59,7 +74,18 @@ export default {
 				}
 			}
 			return -1;
-		}
+		},
+		quit(){
+			window.open('/','_self')
+		},
+		checkSession(){
+            this.axios({
+                url:apiHost+'/checkSession',
+                method:'post',
+            }).then(res=>{
+                console.log(res.data)
+            })
+        },
 	}
 	
 }

@@ -17,7 +17,7 @@
                     </el-col>
             </el-row>
         </div>
-        <el-dialog :visible.sync="loginDialog"  center :append-to-body='true' :close-on-click-modal='false' width="500px">
+        <el-dialog :visible.sync="loginDialog"  center :append-to-body='true' :close-on-click-modal='false' width="500px" id="loginDialog">
             <span>
                 <div style="font-size:5rem;color:#409EFF;margin-bottom:20px" align="center"> <img :src="require('../../../assets/logo.png')" alt=""></div>
                 <el-input v-model="name" maxlength="20"  show-word-limit minlength="2">
@@ -27,7 +27,10 @@
                     <template slot="prepend">密码</template>
                 </el-input>
             </span>
-            <span slot="footer" class="dialog-footer">
+            <div align="right" style="margin-top:20px">
+                <el-checkbox v-model="adminLogin">管理员登录</el-checkbox>
+            </div>
+            <span slot="footer" class="dialog-footer" style="padding:0;margin:0">
                 <el-button @click="loginDialog = false">取 消</el-button>
                 <el-button type="primary" @click="login">登 录</el-button>
                 <div align="center" style="margin-top:30px;color:#454545">没有账号？<span style="color:#409EFF;cursor:pointer" @click="registerDialog=true;loginDialog=false">去注册</span></div>
@@ -36,7 +39,7 @@
         <el-dialog :visible.sync="registerDialog"  center :append-to-body='true' :close-on-click-modal='false' width="500px">
             <span>
                 <div style="font-size:5rem;color:#409EFF;margin-bottom:20px" align="center"> <img :src="require('../../../assets/logo.png')" alt=""></div>
-                <el-input v-model="name" maxlength="20"  show-word-limit minlength="2" @change="checkName()">
+                <el-input v-model="name" maxlength="20"  show-word-limit minlength="2">
                     <template slot="prepend">账号</template>
                     <template slot="append" v-if="check1" >
                         <el-tooltip :content="check1_msg" placement="top-start">
@@ -110,34 +113,58 @@ export default {
             check4:false,//检查注册时邮箱格式的提示图标状态
             check4_icon:'el-icon-loading',
             check4_icon_color:'color:',
-            check4_msg:''
+            check4_msg:'',
+            adminLogin:false
         }
     },
     computed:{
     },
     methods:{
         login(){
-            let loading1 = this.$loading({
-                lock: true,
-                text: 'Loading',
-                spinner: 'el-icon-loading',
-                background: 'rgba(0, 0, 0, 0.7)'
-            });
-            this.axios({
-                url:apiHost+"/login",
-                method:'post',
-                data:{'user_name':this.name,'password':md5(this.pw)}
-            }).then((res)=>{
-                loading1.close();
-                if(res.data.code==200){
-                    this.loginDialog = false;
-                    this.$emit('getUserInfo',res.data)
-                    localStorage['userinfo']=res.data;
-                    this.$router.replace('/home');
-                }else{
-                    this.$message.error(res.data.msg);
-                }
-            })
+            if(this.adminLogin){
+                this.axios({
+                    url:apiHost+'/admin/adminLogin',
+                    method:'post',
+                    data:{'user_name':this.name,'password':md5(this.pw)}
+                }).then(res=>{
+                    console.log(res)
+                    if(res.data.code==200){
+                        localStorage['userInfo']=JSON.stringify(res.data.data);
+                        window.open('/manage.html','_self');
+                    }else{
+                        this.$message.error(res.data.msg);
+                    }
+                })
+                return;
+            }
+            if(this.name.trim().length>0&&this.pw.trim().length>0){
+                let loading1 = this.$loading({
+                    lock: true,
+                    text: 'Loading',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.7)'
+                });
+                this.axios({
+                    url:apiHost+"/login",
+                    method:'post',
+                    data:{'user_name':this.name,'password':md5(this.pw)}
+                }).then((res)=>{
+                    loading1.close();
+                    if(res.data.code==200){
+                        this.loginDialog = false;
+                        this.$emit('getUserInfo',res.data);
+                        
+                        localStorage['userinfo']=res.data;
+                        if(this.adminLogin){
+                                window.open('/manage')
+                                retrun;
+                        }
+                        this.$router.replace('/home');
+                    }else{
+                        this.$message.error(res.data.msg);
+                    }
+                })
+            }
         },
         checkName(){
             this.check1=true;
@@ -228,6 +255,11 @@ export default {
         
     },
     watch:{
+        name:function(newVal,oldVal){
+            if(this.registerDialog){
+                this.checkName();
+            }
+        },
         pw:function(newVal,oldVal){
             if(newVal!=oldVal){
                 this.check2=true;
@@ -289,5 +321,8 @@ export default {
         background-position: center center;
         background-repeat: no-repeat;
         background-color:rgb(78, 160, 243,0.5)
+    }
+    #loginDialog .el-dialog__body{
+        padding-bottom:0;
     }
 </style>

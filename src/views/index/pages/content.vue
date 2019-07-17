@@ -164,7 +164,7 @@ export default {
         },
         getComment(){
             this.axios({
-                url:apiHost+'/anon/replyInfo/viewReplyInfo?post_title_id='+this.id,
+                url:apiHost+'/replyInfo/viewReplyInfo?post_title_id='+this.id,
                 method:'get'
             }).then(res=>{
                 if(res.data.code==200){

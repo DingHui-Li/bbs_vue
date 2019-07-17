@@ -39,7 +39,7 @@
 			</el-input>
 			<div style="margin:20px 0 20px 0;font-weight:bold;color:#757575">
 				分区版主：
-				<div style="float:right;margin-right:15px;font-size:1.5rem;color:#4CAF50" @click="addPlateModerator">
+				<div style="float:right;margin-right:15px;font-size:1.5rem;color:#4CAF50" @click="addDistrictModerator">
 					<i class="fa fa-plus-circle" aria-hidden="true"></i> 
 				</div>
 			</div>
@@ -51,7 +51,7 @@
 				</div>
 				<div style="float:left;line-height:30px">{{moterator.nick_name}}</div>
 				<div style="line-height:30px;float:right;margin-right:10px;color:red;font-size:1.2rem">
-					<i class="fa fa-minus-circle" aria-hidden="true" @click="deltePlateModerator(moterator.user_id)"></i>
+					<i class="fa fa-minus-circle" aria-hidden="true" @click="delteDistrictModerator(moterator.user_id)"></i>
 				</div>
 			</div>
 		</el-dialog>
@@ -92,6 +92,7 @@ export default {
 			},
 			modifyDistrictData:{
 				id:-1,
+				plate_id:-1,
 				district_name:'',
 				moderator:[]
 			},
@@ -122,7 +123,12 @@ export default {
 					this.plateData={'name':'狗扑','children':[]};
 					this.plateData.children=res.data.map(plate=>{
 						let children=plate.districtInfos.map(district=>{
-							return {'name':district.district_name,'value':district.post_num,'id':district.id,'type':'district'}
+							return {'name':district.district_name,
+									'value':district.post_num,
+									'id':district.id,
+									'plate_id':district.plate_id,
+									'type':'district'
+									}
 						});
 						children.push({'name':'+','plate_id':plate.id,'type':'addDist',itemStyle:{color:'#4CAF50',borderColor:'none'},})
 						return {'name':plate.plate_name,'children':children,'id':plate.id,'type':'plate'}
@@ -182,7 +188,7 @@ export default {
 		},
 		getDistrictModerator(){
 			this.axios({
-				url:apiHost+'/admin/getDistrictModerator?district_id='+this.modifyDistrictData.id,
+				url:apiHost+'/admin/getDisOwner?district_id='+this.modifyDistrictData.id+'&plate_id='+this.modifyDistrictData.plate_id,
 				method:'get'
 			}).then(res=>{
 				if(res.data.code==200){
@@ -211,14 +217,48 @@ export default {
 					})
 				})
 		},
+		addDistrictModerator(){
+			this.$prompt('请输入用户id', '提示', {
+				confirmButtonText: '确定',
+				cancelButtonText: '取消',
+				inputPattern: /^[0-9]*$/ ,
+				inputErrorMessage: '只能输入数字'
+				}).then(({ value }) => {
+					this.axios({
+						url:apiHost+'/admin/addDisOwner',
+						method:'post',
+						data:{'user_id':value,'plate_id':this.modifyDistrictData.plate_id,'district_id':this.modifyDistrictData.id}
+					}).then(res=>{
+						if(res.data.code==200){
+							this.getDistrictModerator();
+							this.$notify({'title':'添加区主成功',type:"success"});
+						}else{
+							this.$notify.error(res.data.msg);
+						}
+					})
+				})
+		},
 		deltePlateModerator(id){
 			this.axios({
-				url:apiHost+'/admin/deletePlateModerator?user_id='+id,
+				url:apiHost+'/admin/deletePlateModerator?user_id='+id+'&plate_id='+this.modifyPlateData.id,
 				method:'get'
 			}).then(res=>{
 				if(res.data.code==200){
 					this.getModerator();
 					this.$notify({'title':'删除版主成功',type:"success"});
+				}else{
+					this.$notify.error(res.data.msg);
+				}
+			})
+		},
+		delteDistrictModerator(id){
+			this.axios({
+				url:apiHost+'/admin/deleteDisOwner?user_id='+id+'&district_id='+this.modifyDistrictData.id,
+				method:'get'
+			}).then(res=>{
+				if(res.data.code==200){
+					this.getDistrictModerator();
+					this.$notify({'title':'删除区主成功',type:"success"});
 				}else{
 					this.$notify.error(res.data.msg);
 				}
@@ -244,18 +284,58 @@ export default {
 				})
 			})
 		},
-		modifyPlate(){
-			this.axios({
-				url:apiHost+'/admin/updatePlates?name='+this.modifyPlateData.plate_name+"&id="+this.modifyPlateData.id,
-				method:'post'
-			}).then(res=>{
-				if(res.data.code==200){
-					this.$notify({'title':'修改板块成功',type:"success"});
-					this.getPlateData();
-				}else{
-					this.$notify.error('修改板块失败');
-				}
+		deleteDistrict(){
+			this.$confirm('此操作将会删除所属的所有帖子，且不可撤销，是否继续','警告',{
+				confirmButtonText:'确定',
+				cancelButtonText:'取消',
+				type:'warning'
+			}).then(()=>{
+				this.axios({
+					url:apiHost+'/admin/deleteDistricts?id='+this.modifyDistrictData.id,
+					method:'post'
+				}).then(res=>{
+					if(res.data.code==200){
+						this.getPlateData();
+						this.modifyDistrictDialog=false;
+						this.$notify({'title':'删除分区成功',type:"success"});
+					}else{
+						this.$notify.error('删除分区失败');
+					}
+				})
 			})
+		},
+		modifyPlate(){
+			if(this.modifyPlateData.plate_name.trim().length>0){
+				this.axios({
+					url:apiHost+'/admin/updatePlates?name='+this.modifyPlateData.plate_name+"&id="+this.modifyPlateData.id,
+					method:'post'
+				}).then(res=>{
+					if(res.data.code==200){
+						this.$notify({'title':'修改板块成功',type:"success"});
+						this.getPlateData();
+					}else{
+						this.$notify.error('修改板块失败');
+					}
+				})
+			}
+		},
+		modifyDistrict(){
+			if(this.modifyDistrictData.district_name.trim().length>0){
+				this.axios({
+					url:apiHost+'/admin/updateDistricts?',
+					method:'post',
+					data:{'district_name':this.modifyDistrictData.district_name,
+							'id':this.modifyDistrictData.id,
+							'plate_id':this.modifyDistrictData.plate_id}
+				}).then(res=>{
+					if(res.data.code==200){
+						this.$notify({'title':'修改分区成功',type:"success"});
+						this.getPlateData();
+					}else{
+						this.$notify.error('修改分区失败');
+					}
+				})
+			}
 		},
 		init(){
 			let charts=echarts.init(document.getElementById('plateChart'));
@@ -304,6 +384,7 @@ export default {
 					this.modifyDistrictDialog=true;
 					this.modifyDistrictData.district_name=params.data.name;
 					this.modifyDistrictData.id=params.data.id;
+					this.modifyDistrictData.plate_id=params.data.plate_id;
 					this.getDistrictModerator();
 				}
 				else if(params.data.type=='addPlate'){

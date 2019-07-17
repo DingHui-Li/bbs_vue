@@ -21,7 +21,7 @@
 			<el-col :xs="24" :lg="12" style="padding:10px">
 				<el-button type="primary" :style="{display:deleteBtn}" @click="deletePost">删除</el-button>
 			</el-col>
-			<el-table :data='postData' stripe  ref="multipleTable" @select="select" id="postTable"
+			<el-table :data='postData' stripe  ref="multipleTable" @select="select" id="postTable" @select-all="select"
 					element-loading-text="拼命加载中" element-loading-background="rgba(0, 0, 0, 0.8)">
 				<el-table-column type="selection"></el-table-column>
 				<el-table-column prop="id" label="ID"  align="center"></el-table-column>
@@ -176,7 +176,7 @@ export default {
 						type:'success'
 					})
 				}else{
-					this.$notify.error('修改失败')
+					this.$notify.error(res.data.msg)
 				}
 			})
 		},
