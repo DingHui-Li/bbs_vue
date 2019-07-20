@@ -20,7 +20,7 @@
 			</el-aside>
 			<el-main style="padding:0;height:60vh">
 				<div style="font-size:1.2rem;color:#757575;font-weight:bold;padding:20px">昵称</div>
-				<div style="height:88%;"  id="sendArea">
+				<div id="sendArea">
 					<el-scrollbar>
 							<message :isme="false"/>
 							<message :isme="true"/>	
@@ -29,7 +29,7 @@
 							<message :isme="false"/>
 							<message :isme="true"/>	
 					</el-scrollbar>
-					<div style="height:20%;" align="right">
+					<div align="right">
 						<el-input ></el-input>
 						<el-button style="margin:10px">发送</el-button>
 					</div>

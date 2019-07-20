@@ -28,7 +28,7 @@
                 </el-input>
             </span>
             <div align="right" style="margin-top:20px">
-                <el-checkbox v-model="adminLogin">管理员登录</el-checkbox>
+                <el-checkbox v-model="adminLogin">后台登录</el-checkbox>
             </div>
             <span slot="footer" class="dialog-footer" style="padding:0;margin:0">
                 <el-button @click="loginDialog = false">取 消</el-button>
@@ -127,9 +127,10 @@ export default {
                     method:'post',
                     data:{'user_name':this.name,'password':md5(this.pw)}
                 }).then(res=>{
-                    console.log(res)
                     if(res.data.code==200){
                         localStorage['userInfo']=JSON.stringify(res.data.data);
+                        localStorage['userId']=res.data.data.id;
+                        localStorage['userIcon']=res.data.data.userBaseInfo.icon;
                         window.open('/manage.html','_self');
                     }else{
                         this.$message.error(res.data.msg);
@@ -150,12 +151,12 @@ export default {
                     data:{'user_name':this.name,'password':md5(this.pw)}
                 }).then((res)=>{
                     loading1.close();
-                    console.log(res)
                     if(res.data.code==200){
                         this.loginDialog = false;
-                        this.$emit('getUserInfo',res.data);
                         localStorage['userId']=res.data.id;
+                        localStorage['userIcon']=res.data.icon;
                         this.$router.replace('/home');
+                        this.$emit('getMessageNum')
                     }else{
                         this.$message.error(res.data.msg);
                     }

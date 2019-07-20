@@ -32,8 +32,8 @@
                                 {{actDistrictName}}
                             </div>
                             <div>
-                                <div style="font-size:0.9rem;line-height:30px">所属板块：{{actPlateName}}</div> 
-                                <div style="float:left;font-size:0.9rem;line-height:30px;">分区管理员：</div>
+                                <div style="font-size:0.9rem;line-height:40px">所属板块：{{actPlateName}}</div> 
+                                <!-- <div style="float:left;font-size:0.9rem;line-height:30px;">分区管理员：</div>
                                 <div style="width:25px;float:left;height:25px;line-height:25px">
                                     <el-image src="http://static.simpledesktops.com/uploads/desktops/2014/04/24/highPoint_2880x1800.png" 
                                             style="width:25px;height:25px;border-radius:50%">
@@ -41,7 +41,7 @@
                                 </div>
                                 <div style="font-size:0.9rem;line-height:30px;"> 
                                     <span style="padding-left:6px">ss</span>
-                                </div>
+                                </div> -->
                             </div> 
                         </div>
                         <div>
@@ -162,7 +162,7 @@ export default {
     },
     mounted(){
         this.getPlate();
-        this.getNotice(-1,-1);
+        this.getNotice(0,0);
     },
     beforeRouteEnter(to,from,next){
         next(vm=>{
@@ -190,8 +190,8 @@ export default {
             }).then(res=>{
                 if(res!=undefined){
                     this.plates=res.data;
-                    this.getNotice(this.plates[0].id,-1);
-                    this.getNotice(-1,this.plates[0].districtInfos[0].id);
+                    this.getNotice(this.plates[0].id,0);
+                    this.getNotice(0,this.plates[0].districtInfos[0].id);
                     this.actDistrict=this.plates[0].districtInfos[0].id;
                     this.pageNum=1;
                     this.getDistPost();
@@ -229,13 +229,14 @@ export default {
                 url:apiHost+'/anon/getRecentAnnouncement?plate_id='+plate_id+'&district_id='+district_id,
                 method:'get'
             }).then(res=>{
+                console.log(plate_id+","+district_id)
                 if(res.data.code==200){
-                    if(plate_id==-1&&district_id==-1){
+                    if(plate_id==0&&district_id==0){
                         this.totalNotice=res.data;
                     }
-                    else if(plate_id!=-1&&district_id==-1){
+                    else if(plate_id!=0&&district_id==0){
                         this.plateNotice=res.data;
-                    }else if(plate_id==-1&&district_id!=-1){
+                    }else if(plate_id==0&&district_id!=0){
                         this.districtNotice=res.data;
                     }
                 }
@@ -249,8 +250,8 @@ export default {
             this.postNum=0;
             this.getDistPost();
             this.getQuality();
-            this.getNotice(plate_id,-1);
-            this.getNotice(-1,district_id);
+            this.getNotice(plate_id,0);
+            this.getNotice(0,district_id);
             this.getPlateNameANDDistrictName();
             
         },

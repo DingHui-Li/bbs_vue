@@ -27,7 +27,7 @@
                         <td style="color:#FF5252">
                             <i class="fa fa-heart" aria-hidden="true" v-if="data.liked" @click='like()'></i>
                             <i class="fa fa-heart-o" aria-hidden="true" v-else @click='like()'></i>
-                            <span> {{data.like_num}}</span>
+                            <span>  {{data.like_num}}</span>
                         </td>
                         <td style="color:#2196F3">
                             <i class="fa fa-commenting" aria-hidden="true" > {{data.reply_num}}</i>
@@ -52,6 +52,9 @@ import { apiHost,imgHost } from '../../../../apiConfig';
 export default {
     name:'post_horizontal',
     props:['data','isme','type'],
+    mounted(){
+        //console.log(this.data)
+    },
     methods:{
         postClick(id){
             if(this.type=="mark")

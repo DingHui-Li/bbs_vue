@@ -2,24 +2,24 @@
 	<el-container>
 		<el-aside style="position:fixed;" id="toolbar" class="hidden-sm-and-down">
 			<el-menu style="background-color:#455A64;height:100vh;color:#fff" align="center">
-				<div style="width:100%;height:100px;margin-top:40px;border-bottom:1px solid #e0e0e0" align="center">
-					<div style="width:35px;">
-						<el-image :src="geturl(userInfo.userBaseInfo.icon)" style="height:30px;width:30px;border-radius:50%"></el-image>
+				<div style="width:100%;height:100px;margin-top:30px;padding-bottom:30px;border-bottom:1px solid #e0e0e0" align="center" v-if="userInfo.userBaseInfo!=undefined">
+					<div>
+						<el-image :src="geturl(userInfo.userBaseInfo.icon)" style="height:50px;width:50px;border-radius:50%"></el-image>
 					</div>
 					<span style="font-size:0.8rem ">{{userInfo.userBaseInfo.nick_name}}</span>
 					<div>
 						{{userInfo.roleInfos[0].name}}
 					</div>
 				</div>
-				<el-menu-item v-for="item in sideNav" :key="item.path" :index="item.path" @click="addTab(item.name,item.path)">
+				<el-menu-item v-for="item in sideNavToRole" :key="item.path" :index="item.path" @click="addTab(item.name,item.path)">
 					{{item.name}}
 				</el-menu-item>
 				<el-menu-item @click="quit()">退出</el-menu-item>
 			</el-menu>	
 		</el-aside>	
 		<el-aside class="hidden-sm-and-down"></el-aside>
-		<el-main>
-			<router-view></router-view>
+		<el-main style="background-color:rgba(170, 159, 202, 0.205);min-height:100vh">
+			<router-view :role="role" v-if="role!=-1"></router-view>
 		</el-main>
 	</el-container>	
 </template>
@@ -38,14 +38,20 @@ export default {
 				{'name':'公告管理','path':'/noticeManage'},
 			],
 			tabs:[],
-			userInfo:JSON.parse(localStorage['userInfo'])
+			userInfo:JSON.parse(localStorage['userInfo']),
+			role:-1
 		}
 	},
 	updated(){
 		this.checkSession();
 	},
 	mounted(){
-		console.log(this.userInfo)
+		this.checkSession();
+	},
+	computed:{
+		sideNavToRole(){
+			return this.sideNav;
+		}
 	},
 	methods:{
 		geturl(url){
@@ -83,7 +89,15 @@ export default {
                 url:apiHost+'/checkSession',
                 method:'post',
             }).then(res=>{
-                console.log(res.data)
+				console.log(res)
+                if(res.data.code!=200){
+					localStorage['userInfo']="{}";
+					this.$message.error('未登录');
+					this.role=-1;
+					window.open('/',"_self");
+				}else{
+					this.role=res.data.data.roleInfos[0].id;
+				}
             })
         },
 	}

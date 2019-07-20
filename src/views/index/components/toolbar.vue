@@ -16,9 +16,9 @@
                         {{tab.name}}
                     </el-menu-item>
                     <el-submenu index="5" class="hidden-sm-and-down">
-                        <template slot="title">消息 <el-badge :value="2"></el-badge></template>  
-                        <el-menu-item index="/news/system" align="center" @click="$router.replace(`/news/${'system'}`)">系统通知<el-badge :value="1" style="margin-left:5px"></el-badge></el-menu-item>
-                        <el-menu-item index="news/msg" align="center" @click="$router.replace(`/news/${'msg'}`)">短消息<el-badge :value="1" style="margin-left:5px"></el-badge></el-menu-item>
+                        <template slot="title">消息 <el-badge :value="messageNum.total" v-if="messageNum.total!=0"></el-badge></template>  
+                        <el-menu-item index="/news/system" align="center" @click="$router.replace(`/news/${'system'}`)">系统通知<el-badge :value="messageNum.system" v-if="messageNum.system!=0" style="margin-left:5px"></el-badge></el-menu-item>
+                        <el-menu-item index="news/msg" align="center" @click="$router.replace(`/news/${'msg'}`)">回复我<el-badge :value="messageNum.post" v-if="messageNum.post!=0" style="margin-left:5px"></el-badge></el-menu-item>
                     </el-submenu>
                     <el-submenu index="6" class="hidden-sm-and-down" v-if="islogin">
                         <template slot="title">
@@ -36,9 +36,9 @@
         </el-header>
         <el-main style="padding:0;background-color:#e0e0e0;min-height:100vh">
             <keep-alive>
-                <router-view style="margin:0;padding:0" @getUserInfo="getUserInfo" v-if="$route.meta.keepAlive"></router-view>
+                <router-view style="margin:0;padding:0" v-if="$route.meta.keepAlive"></router-view>
             </keep-alive>
-            <router-view style="margin:0;padding:0" @getUserInfo="getUserInfo" v-if="!$route.meta.keepAlive"></router-view>
+            <router-view style="margin:0;padding:0" v-if="!$route.meta.keepAlive" :messageNum="messageNum" @getMessageNum="getMessageNum"></router-view>
         </el-main>
         <div id="sideNav" class="animated slideInLeft" v-if="sideNav" @click="closeSideNav">
             <div style="width:300px;height:200px;background-color:#fff" @click="goPerson()" v-if="islogin">
@@ -75,26 +75,36 @@ export default {
             active:'/home',
             state:'',
             userInfo:{},
-            islogin:false
+            islogin:false,
+            messageNum:0,
+            userIcon:localStorage['userIcon']
         }
     },
     computed:{
         icon(){
-            if(localStorage['userIcon']!=undefined)
-                return imgHost+localStorage['userIcon'];
-            if(this.userInfo!={}){
-                return imgHost+this.userInfo.icon;
-            }
+                return imgHost+this.userIcon;
         }
     },
     mounted:function(){
         this.active=this.$route.path;
         this.center();
         this.checkSession();
+        this.getMessageNum();
+    },
+    updated(){
+        
     },
     methods:{
-        test(){
-            alert('test')
+        getMessageNum(){
+            this.axios({
+                url:apiHost+'/message/getMessageNum',
+                method:'get'
+            }).then(res=>{
+                console.log(res)
+                if(res.data.code==200){
+                    this.messageNum=res.data.data;
+                }
+            })
         },
         tabChange:function(){
             this.drawer=!this.drawer;
@@ -126,19 +136,18 @@ export default {
             let width=ele.offsetLeft;
             ele.style.marginRight=width/2+'px';
         },
-        getUserInfo(info){
-            this.userInfo=info;
-            localStorage['userIcon']=info.icon;
-            localStorage['userId']=info.id;
-        },
         checkSession(){
             this.axios({
                 url:apiHost+'/checkSession',
                 method:'post',
             }).then(res=>{
-                console.log(res.data)
-                if(res.data.code==200) this.islogin=true;
-                else this.islogin=false;
+                if(res.data.code==200) {
+                    this.islogin=true;
+                    localStorage['info']=JSON.stringify(res.data.data);
+                }else{
+                    this.islogin=false;
+                    localStorage['info']='{}';
+                }
             })
         },
         openSideNav(){

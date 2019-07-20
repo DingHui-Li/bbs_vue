@@ -4,10 +4,10 @@
 		<div slot="header" style="font-size:1.2rem;color:#757575;font-weight:bold">我的关注</div>
 		<el-scrollbar>
 			<div style="padding:10px 20px" v-for="i in 9" :key="'focus'+i">
-				<div style="width:55px;float:left">
-					<el-avatar src="http://static.simpledesktops.com/uploads/desktops/2014/03/12/Frutas.png" :size="55"></el-avatar>
+				<div style="width:40px;float:left">
+					<el-avatar src="http://static.simpledesktops.com/uploads/desktops/2014/03/12/Frutas.png" :size="40"></el-avatar>
 				</div>
-				<div style="margin-top:10px;padding-left:60px">
+				<div style="margin-top:10px;padding-left:45px">
 					<div style="font-weight:bold;color:#757575">任我行</div>
 					<div style="color:#757575;font-size:0.8rem;margin:10px 0">00:00</div>
 					<div style="font-weight:bold;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">我是预言家 我预言嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻</div>

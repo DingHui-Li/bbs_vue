@@ -1,7 +1,7 @@
 <template>
 	<el-row type="flex" justify="center" :gutter="10" class="animated fadeInDown">
 		<el-col>
-			<el-col :xs="24" :lg="12" style="padding:10px">
+			<el-col :xs="24" :lg="12" style="padding:0px;margin-bottom:20px">
 				<el-input placeholder="输入关键字以搜索" clearable v-model="serarchKey">
 					<template slot="append">
 						<el-dropdown split-button  @command="changeSearchType">
@@ -65,6 +65,7 @@
 import { apiHost, imgHost } from '../../../../apiConfig';
 import { setTimeout } from 'timers';
 export default {
+	props:['role'],
 	data(){
 		return{
 			userData:[],//用户数据
@@ -80,6 +81,14 @@ export default {
 	mounted(){
 		this.getData();
 		//this.test();
+	},
+	beforeRouteEnter(to,from,next){
+		next(vm=>{
+			if(vm.role<4){
+				vm.$message.error('权限不足');
+				vm.$router.replace(from.path);
+			}
+		})
 	},
 	methods:{
 		geturl(url){
@@ -127,8 +136,8 @@ export default {
 					url:apiHost+'/admin/searchUser?colum_name='+this.searchType+'&s='+this.serarchKey,
 					method:'get'
 				}).then(res=>{
-					console.log(res)
 					if(res.data.code==200){
+						this.userData=res.data.ls;
 						let temp=res.data.ls;
 						let data=[];
 						for(let i=0;i<temp.length;i++){
@@ -146,6 +155,7 @@ export default {
 							data.push(row);
 						}
 						this.userData=data;
+						console.log(this.userData)
 					}
 				})
 			}
@@ -215,7 +225,6 @@ export default {
 	watch:{
 		serarchKey:function(newVal,oldVal){
 			if(newVal!=oldVal){
-				this.loading=true;
 				if(newVal.trim().length==0){
 					this.getData();
 				}

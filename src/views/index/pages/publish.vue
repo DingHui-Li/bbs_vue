@@ -67,7 +67,7 @@ export default {
 				'bold',  // 粗体
 				'fontSize',  // 字号
 				'fontName',  // 字体
-				'italic',  // 斜体
+                'italic',  // 斜体
 				'underline',  // 下划线
 				'strikeThrough',  // 删除线
 				'foreColor',  // 文字颜色
@@ -180,11 +180,12 @@ export default {
                 url:url,
                 method:'post',
                 data:{'title':this.title,'content':content,'districtInfo_id':this.districtId,'image':this.cover,'id':this.id}
-            }).then(res=>{
+            }).then(res=>{ 
+                loading.close();
                 if(res.data.code==200){
                     this.editor.txt.clear();
                     this.title="";
-                    this.cover="";
+                    this.cover='/default.jpg'
                     this.$notify({
                         title: '成功',
                         type: 'success',
@@ -197,7 +198,6 @@ export default {
                         type: 'error'
                     });
                 }
-                loading.close();
             })
         },
         getPlates(){

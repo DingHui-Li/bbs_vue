@@ -12,7 +12,11 @@
 					</el-col>
 					<el-col :span="16" :xs="24" style="padding:0 30px;margin:10px 0" >
 						<div>
-							<span style="font-weight:bold;font-size:1.4rem;float:left">{{userInfo.nick_name}}</span>
+							<div style="float:left;font-weight:bold;">
+								<span style="font-size:1.4rem;">{{userInfo.nick_name}}</span>
+								<span style="margin-left:50px;font-size:0.9rem">ID:{{this.userID}}</span>
+							</div>
+							
 							<div style="float:right" v-if="isme">
 								<i class="fa fa-cog" aria-hidden="true" @click="isModify=true"></i>
 							</div>
@@ -21,7 +25,7 @@
 								<el-button @click="follow()" v-else class="followBtn">已关注</el-button>
 							</div>
 						</div>
-						<div style="margin:15px 0;clear:both">
+						<div style="padding-top:10px;clear:both">
 							<span>{{userInfo.motto}}</span>
 						</div>
 						<div id="infoTable" style="margin-top:20px">
@@ -63,6 +67,7 @@
 		<el-dialog title="粉丝列表" :visible.sync="fansDialog">
 			<followList :userID="userID" @refresh="refresh" type="fans"/>
 		</el-dialog>
+		<fab />
     </el-row>
 </template>
 <script>
@@ -71,9 +76,10 @@ import ezpost from '../components/ezpost'
 import post_horizontal from '../components/post_horizontal'
 import modifyInfo from '../components/modifyInfo'
 import followList from '../components/followList'
+import fab from '../components/fab'
 import { apiHost,imgHost } from '../../../../apiConfig';
 export default {
-	components:{post,ezpost,'post-horizontal':post_horizontal,modifyInfo,followList},
+	components:{fab,post,ezpost,'post-horizontal':post_horizontal,modifyInfo,followList},
     data(){
 		return{
 			postData:[],
@@ -93,10 +99,13 @@ export default {
 		}
 	},
 	mounted(){
+		this.checkIsMe();
 		this.getData();
 		this.getMark();
 		this.getPost();
-		this.checkSession();
+	},
+	updated(){
+		this.checkIsMe();
 	},
 	methods:{
 		geturl(url){
@@ -122,7 +131,7 @@ export default {
 				method:'post'
 			}).then(res=>{
 				loading.close();
-				console.log(res)
+				//console.log(res)
 				if(res.data.code==200){
 					this.userInfo=res.data.userInfo;
 					this.isFollowed=res.data.isFollowed;
@@ -135,7 +144,7 @@ export default {
 				url:apiHost+'/userInfo/UserCollection?id='+this.userID,
 				method:'post'
 			}).then(res=>{
-				// console.log(res)
+				//console.log(res)
 				if(res.data.code==200){
 					this.markData=res.data.collection;
 				}
@@ -151,19 +160,15 @@ export default {
 				}
 			})
 		},
-		checkSession(){
-            this.axios({
-                url:apiHost+'/checkSession',
-                method:'post',
-            }).then(res=>{
-				// console.log(res.data.id)
-				// console.log(localStorage['userId'])
-                if(res.data.code==200){ 
-					if(res.data.id==localStorage['userId']&&res.data.id==this.userID) this.isme=true;
-					else this.isme=false;
-				}
-                else this.isme=false;
-            })
+		checkIsMe(){
+			if(localStorage['info'].length==0){
+				this.isme=false;
+			}
+			else if(this.userID==JSON.parse(localStorage['info']).id){
+				this.isme=true;
+			}else{
+				this.isme=false;
+			}
 		},
 		deletePost(id){
 			for(let i=0;i<this.postData.length;i++){
@@ -203,7 +208,7 @@ export default {
 				this.getData();
 				this.getMark();
 				this.getPost();
-				this.checkSession();
+				
             }
         }
 	}

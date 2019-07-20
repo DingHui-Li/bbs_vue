@@ -1,7 +1,17 @@
 <template>
 	<el-row type="flex" justify="center" :gutter="10" class="animated fadeInDown">
 		<el-col v-if="!isContent">
-			<el-col :xs="24" :lg="12" style="padding:10px">
+			<el-col :xs="24" :lg="12" style="padding:0">
+				<!-- 只能选择分区 -->
+				<el-cascader :options="plateData"  @change="screenChange" v-if="role>=2&&role<4" v-model="screenDistrict"
+					:props="{expandTrigger: 'hover' }">
+				</el-cascader>
+				<!-- 选择板块和分区 -->
+				<el-cascader :options="plates"  @change="screenPlateChange" v-if="role==4" clearable v-model="screenPlate"
+					:props="{expandTrigger: 'hover' }">
+				</el-cascader>
+			</el-col>
+			<el-col :xs="24" :lg="12" style="padding:0px;margin-bottom:20px">
 				<el-input placeholder="输入关键字以搜索" clearable v-model="serarchKey">
 					<template slot="append">
 						<el-dropdown split-button  @command="changeSearchType">
@@ -24,7 +34,7 @@
 			<el-table :data='postData' stripe  ref="multipleTable" @select="select" id="postTable" @select-all="select"
 					element-loading-text="拼命加载中" element-loading-background="rgba(0, 0, 0, 0.8)">
 				<el-table-column type="selection"></el-table-column>
-				<el-table-column prop="id" label="ID"  align="center"></el-table-column>
+				<el-table-column prop="id" label="ID"  align="center" width="50px"></el-table-column>
 				<el-table-column prop="title" label="标题"  align="center" width="200px">
 					<template slot-scope="scope">
 						<u @click="selectPostid=scope.row.id;isContent=true" style="cursor:pointer;color:#2196F3">{{scope.row.title}}</u>
@@ -57,7 +67,7 @@
 				<el-table-column label="分区" width="150px">
 					<template slot-scope="scope">
 						<el-cascader placeholder="请选择分区"
-                            :options="plateData" 
+                            :options="plates" 
                             :value="[scope.row.plate_id,scope.row.plate_id+'-'+scope.row.districtInfo_id]"
                             @change="selectPlate($event,scope.row.id)"  :props="{ expandTrigger: 'hover' }">
 						</el-cascader>
@@ -95,10 +105,14 @@
 import { apiHost, imgHost } from '../../../../apiConfig';
 import { setTimeout } from 'timers';
 export default {
+	props:['role'],
 	data(){
 		return{
 			postData:[],//帖子数据
 			plateData:[],//分区数据
+			screenPlate:-1,//选中的板块--管理员
+			screenDistrict:-1,//选中的分区--版主
+			plates:[],
 			selectedPlate:['1','1-1'],
 			serarchKey:'',//搜索关键字
 			searchType:'PostTitleInfo.id',//搜索类型
@@ -109,17 +123,37 @@ export default {
 			pageNum:1,//当前页数
 			isContent:false,//内容页
 			selectPostid:-1,//选中的帖子id，用于获取内容
-			contentData:[]
+			contentData:[],
 		}
 	},
 	mounted(){
-		this.getData();
-		this.getPlateData();
+		if(this.role==4){
+			this.getData();
+		}
+		else{
+			this.getDis();
+		}
+		this.getPlates();
 	},
 	computed:{
 		
 	},
 	methods:{
+		checkSession(){
+            this.axios({
+                url:apiHost+'/checkSession',
+                method:'post',
+            }).then(res=>{
+                if(res.data.code!=200){
+					localStorage['userInfo']="{}";
+					this.$message.error('未登录');
+					this.role=-1;
+					window.open('/',"_self");
+				}else{
+					this.role=res.data.data.roleInfos[0].id;
+				}
+            })
+        },
 		geturl(url){
 			return imgHost+url;
 		},
@@ -136,7 +170,6 @@ export default {
             }).then(res=>{
 				loading.close();
 				this.loading=false;
-				console.log(res)
                 if(res.data.code==200){
 					this.postData=res.data.PostTitleList;
 					this.allPageNum=Math.ceil(res.data.num/10);
@@ -145,6 +178,20 @@ export default {
 				}
 				
             })
+		},
+		getPlateOrDistPost(){
+			this.axios({
+				url:apiHost+'/admin/getPostTitlesByDis?size=10&district_id='+this.screenDistrict+"&page="+this.pageNum,
+				method:'get',
+			}).then(res=>{
+				console.log(res)
+				if(res.data.code==200){
+					this.postData=res.data.data.list;
+					this.allPageNum=Math.ceil(res.data.data.total/10);
+				}else{
+					this.$notify.error(res.data.msg)
+				}
+			})
 		},
 		getContent(){
 			this.axios({
@@ -197,20 +244,33 @@ export default {
 				}
 			})
 		},
-		getPlateData(){
+		getDis(){//获取分区版主和版主管理的分区
+            this.axios({
+                url:apiHost+"/admin/getDis",
+                method:"get"
+            }).then(res=>{
+                if(res.data.code==200){
+                    this.plateData=res.data.data.map(plate=>{
+                        return {'value':plate.id,'label':plate.district_name}
+					})
+					this.screenDistrict=this.plateData[0].value;
+				}
+            })
+		},
+
+		getPlates(){
             this.axios({
                 url:apiHost+"/anon/plate/getPlates",
                 method:"get"
             }).then(res=>{
                 if(res!=undefined){
-                    this.plateData=res.data.map(plate=>{
+                    this.plates=res.data.map(plate=>{
                         let children=plate.districtInfos.map(district=>{
-                            //父级value与子级value不能相同，所以给子级value前加上'父级id-',导致获取子级id时需要分割字符串
                             return {'value':district.plate_id+'-'+district.id,'label':district.district_name};
                         })
                         return {'value':plate.id,'label':plate.plate_name,'children':children}
                     })
-                }
+				}
             })
 		},
 		search(){
@@ -222,12 +282,13 @@ export default {
 			});
 			if(this.serarchKey.trim().length>0){
 				this.axios({
-					url:apiHost+'/admin/searchByColum?size=10&page=1&colum_name='+this.searchType+'&s='+this.serarchKey,
+					url:apiHost+'/admin/searchByColum?size=10&&colum_name='+this.searchType+'&s='+this.serarchKey+"&page="+this.pageNum,
 					method:'get'
 				}).then(res=>{
 					loading.close();
 					if(res.data.code==200){
 						this.postData=res.data.ls;
+						this.allPageNum=Math.ceil(res.data.num/10);
 					}
 				})
 			}
@@ -258,8 +319,28 @@ export default {
 			}
 		},
 		pageChange(page){
+			console.log(this.screenPlate+","+this.screenDistrict)
 			this.pageNum=page;
-			this.getData();
+			if(this.serarchKey!=''){
+				this.search();
+			}
+			else if(this.screenPlate!=-1||this.screenDistrict!=-1){
+				this.getPlateOrDistPost();
+			}
+			else{
+				this.getData();
+			}
+		},
+		screenChange(value){
+			this.screenDistrict=value;
+			this.pageNum=1;
+		},
+		screenPlateChange(value){
+			if(value!=""){
+				let temp=value[1].split('-');
+				this.screenDistrict=temp[1];
+				this.pageNum=1;
+			}
 		},
 		dateFormat(date){
 			let d=new Date(date);
@@ -271,7 +352,12 @@ export default {
 			if(newVal!=oldVal){
 				this.loading=true;
 				if(newVal.trim().length==0){
-					this.getData();
+					if(this.role==4){
+						this.getData();
+					}
+					else{
+						this.getPlateOrDistPost();
+					}
 				}
 				else{
 					setTimeout(()=>{
@@ -289,8 +375,17 @@ export default {
 		},
 		selectPostid:function(newVal,oldVal){
 			this.getContent();
+		},
+		screenDistrict:function(newVal,oldVal){
+			this.getPlateOrDistPost();
+		},
+		screenPlate:function(newVal,oldVal){
+			if(newVal.length==0){
+				this.screenPlate=-1;
+				this.getData();
+			}
 		}
-	}
+	},
 }
 </script>
 <style>

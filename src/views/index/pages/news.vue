@@ -1,5 +1,5 @@
 <template>
-    <el-row type="flex" justify="center" :gutter="20" id="news" style="position:fixed;width:100%" >
+    <el-row type="flex" justify="center" :gutter="20" id="news" style="width:100%" >
         <el-col :xl="18" :xs='24'>
             <el-container style="padding-top:20px">
 				<el-aside style="padding-right:10px;">
@@ -9,28 +9,33 @@
 							<span style="font-weight:bold;color:#757575"> 消息中心</span> 
 						</div>
 						<el-menu align="center">
-							<el-menu-item  v-for="(item,index) in leftItem" :key="item.name" :index="item.name" @click="select=index">
+							<el-menu-item @click="select=0">
 								<i class="fa fa-circle" aria-hidden="true" style="font-size:0.5rem;color:#757575"></i>
-								<span class="leftItem" style="margin-right:10px;color:#757575"> {{item.name}}</span> 
-								<el-badge style="margin-left:5px" :value="item.count" :hidden="!(item.count>0)||badgeType=='hidden'" :is-dot="badgeType=='dot'"></el-badge>
+								<span class="leftItem" style="margin-right:10px;color:#757575">回复我的</span> 
+								<el-badge style="margin-left:5px" :value="messageNum.post" v-if="badgeType!='hidden'&&messageNum.post!=0" :is-dot="badgeType=='dot'"></el-badge>
+							</el-menu-item>
+							<el-menu-item @click="select=1">
+								<i class="fa fa-circle" aria-hidden="true" style="font-size:0.5rem;color:#757575"></i>
+								<span class="leftItem" style="margin-right:10px;color:#757575">系统通知</span> 
+								<el-badge style="margin-left:5px" :value="messageNum.system" v-if="badgeType!='hidden'&&messageNum.system!=0" :is-dot="badgeType=='dot'"></el-badge>
 							</el-menu-item>
 						</el-menu>
 						<el-divider></el-divider>
-						<div align="center" style="cursor:pointer;padding-bottom:20px" @click="select=5">
+						<div align="center" style="cursor:pointer;padding-bottom:20px" @click="select=3">
 							<i class="fa fa-cog" aria-hidden="true" style="color:#757575"></i>
 							<span> 消息设置</span>
 						</div>
 					</el-card>
 				</el-aside>
 				<el-main style="padding:0;">
-					<focus v-if="select==0" class="animated slideInLeft" style="animation-duration:0.5s"/>
-					<comment2me v-else-if="select==1" class="animated slideInLeft" style="animation-duration:0.5s"/>
-					<like v-else-if="select==2" class="animated slideInLeft" style="animation-duration:0.5s"/>
-					<systemNotic v-else-if="select==3" class="animated slideInLeft" style="animation-duration:0.5s"/>
-					<myMsg v-else-if="select==4" class="animated slideInLeft" style="animation-duration:0.5s"/>
-					<newsSet v-else-if="select==5" class="animated slideInLeft" style="animation-duration:0.5s" @changeBadgeType="changeBadgeType"/>
+					<!-- <focus v-if="select==0" class="animated slideInLeft" style="animation-duration:0.5s"/> -->
+					<comment2me v-if="select==0" class="animated slideInLeft" style="animation-duration:0.5s"/>
+					<like v-else-if="select==1" class="animated slideInLeft" style="animation-duration:0.5s"/>
+					<!-- <systemNotic v-else-if="select==3" class="animated slideInLeft" style="animation-duration:0.5s"/> -->
+					<myMsg v-else-if="select==2" class="animated slideInLeft" style="animation-duration:0.5s"/>
+					<newsSet v-else-if="select==3" class="animated slideInLeft" style="animation-duration:0.5s" @changeBadgeType="changeBadgeType"/>
 				</el-main>
-				<el-aside style="padding-left:10px;cursor:pointer;">
+				<!-- <el-aside style="padding-left:10px;cursor:pointer;">
 					<el-card style="padding:0;" id="rightItemCard">
 						<el-image src="http://static.simpledesktops.com/uploads/desktops/2014/03/12/Frutas.png" fit="cover" style="height:100px;border-radius:5px 5px 0 0"></el-image>
 						<div style="margin-top:-35px;margin-left:35px;z-index:9;position:relative;width:60px;float:left">
@@ -67,7 +72,7 @@
 							</div>
 						</el-scrollbar>
 					</el-card>
-				</el-aside>
+				</el-aside> -->
 			</el-container>
         </el-col>
     </el-row>
@@ -81,13 +86,14 @@ import newsSet from '../components/newsSet'
 import myMsg from '../components/myMsg'
 export default {
 	components:{focus,comment2me,like,systemNotic,newsSet,myMsg},
+	props:['messageNum'],
     data(){
 		return{
 			type:this.$route.params.type,
 			leftItem:[
-				{'name':"关注动态",'count':'0'},
+				// {'name':"关注动态",'count':'0'},
 				{'name':"回复我的",'count':'1'},
-				{'name':"收到的赞",'count':'2'},
+				// {'name':"收到的赞",'count':'2'},
 				{'name':"系统通知",'count':'3'},
 				{'name':"我的消息",'count':'4'},
 			],
@@ -96,7 +102,7 @@ export default {
 		}
 	},
 	mounted(){
-		
+		console.log(this.messageNum)
 	},
 	methods:{
 		changeBadgeType(type){

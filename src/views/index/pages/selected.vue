@@ -11,9 +11,11 @@
                     </el-image>
                     <div class="title" align="center" @click="goPost(1)">{{postData[1].postTitle.title}}</div>
                     <div class="info" style="line-height:50px">
-                        <i class="fa fa-heart-o" aria-hidden="true" style="color:#FF5252"> {{postData[1].postTitle.like_num}}</i>
-                        <i class="fa fa-commenting-o" aria-hidden="true" style="margin:0 20px;color:#2196F3"> {{postData[1].postTitle.reply_num}}</i>
-                        <i class="fa fa-star-o" aria-hidden="true" style="margin-right:20px;color:#FF9800"> {{postData[1].postTitle.recommend_num}}</i>
+                        <i class="fa fa-heart" aria-hidden="true" style="color:#FF5252" @click='like(1)' v-if="postData[1].postTitle.liked"> {{postData[1].postTitle.like_num}}</i>
+                        <i class="fa fa-heart-o" aria-hidden="true" style="color:#FF5252" @click='like(1)' v-else> {{postData[1].postTitle.like_num}}</i>
+                        <i class="fa fa-commenting" aria-hidden="true" style="margin:0 20px;color:#2196F3"> {{postData[1].postTitle.reply_num}}</i>
+                        <i class="fa fa-star" aria-hidden="true" style="margin-right:20px;color:#FF9800"  v-if="postData[1].postTitle.collected" @click="mark(1)"> {{postData[1].postTitle.recommend_num}}</i>
+                        <i class="fa fa-star-o" aria-hidden="true" style="margin-right:20px;color:#FF9800" v-else  @click="mark(1)"> {{postData[1].postTitle.recommend_num}}</i>
                         <i class="fa fa-eye" aria-hidden="true" style="color:#8BC34A;"> {{postData[1].postTitle.view_num}}</i>
                     </div>
                 </div>
@@ -31,9 +33,11 @@
                         {{postData[0].postTitle.title}}
                     </div>
                     <div class="info">
-                        <i class="fa fa-heart-o" aria-hidden="true" style="color:#FF5252"> {{postData[0].postTitle.like_num}}</i>
-                        <i class="fa fa-commenting-o" aria-hidden="true" style="margin:0 20px;color:#2196F3"> {{postData[0].postTitle.reply_num}}</i>
-                        <i class="fa fa-star-o" aria-hidden="true" style="margin-right:20px;color:#FF9800"> {{postData[0].postTitle.recommend_num}}</i>
+                        <i class="fa fa-heart" aria-hidden="true" style="color:#FF5252" @click='like(0)' v-if="postData[0].postTitle.liked"> {{postData[0].postTitle.like_num}}</i>
+                        <i class="fa fa-heart-o" aria-hidden="true" style="color:#FF5252" @click='like(0)' v-else> {{postData[0].postTitle.like_num}}</i>
+                        <i class="fa fa-commenting" aria-hidden="true" style="margin:0 20px;color:#2196F3"> {{postData[0].postTitle.reply_num}}</i>
+                        <i class="fa fa-star" aria-hidden="true" style="margin-right:20px;color:#FF9800"  v-if="postData[0].postTitle.collected" @click="mark(0)"> {{postData[0].postTitle.recommend_num}}</i>
+                        <i class="fa fa-star-o" aria-hidden="true" style="margin-right:20px;color:#FF9800" v-else  @click="mark(0)"> {{postData[0].postTitle.recommend_num}}</i>
                         <i class="fa fa-eye" aria-hidden="true" style="color:#8BC34A;"> {{postData[0].postTitle.view_num}}</i>
                     </div>
                 </div>
@@ -48,9 +52,11 @@
                     </el-image>
                     <div class="title" align="center" @click="goPost(2)">{{postData[2].postTitle.title}}</div>
                     <div class="info" style="line-height:50px">
-                        <i class="fa fa-heart-o" aria-hidden="true" style="color:#FF5252"> {{postData[2].postTitle.like_num}}</i>
-                        <i class="fa fa-commenting-o" aria-hidden="true" style="margin:0 20px;color:#2196F3"> {{postData[2].postTitle.reply_num}}</i>
-                        <i class="fa fa-star-o" aria-hidden="true" style="margin-right:20px;color:#FF9800"> {{postData[2].postTitle.recommend_num}}</i>
+                        <i class="fa fa-heart" aria-hidden="true" style="color:#FF5252" @click='like(2)' v-if="postData[2].postTitle.liked"> {{postData[2].postTitle.like_num}}</i>
+                        <i class="fa fa-heart-o" aria-hidden="true" style="color:#FF5252" @click='like(2)' v-else> {{postData[2].postTitle.like_num}}</i>
+                        <i class="fa fa-commenting" aria-hidden="true" style="margin:0 20px;color:#2196F3"> {{postData[2].postTitle.reply_num}}</i>
+                        <i class="fa fa-star" aria-hidden="true" style="margin-right:20px;color:#FF9800"  v-if="postData[2].postTitle.collected" @click="mark(2)"> {{postData[2].postTitle.recommend_num}}</i>
+                        <i class="fa fa-star-o" aria-hidden="true" style="margin-right:20px;color:#FF9800" v-else  @click="mark(2)"> {{postData[1].postTitle.recommend_num}}</i>
                         <i class="fa fa-eye" aria-hidden="true" style="color:#8BC34A;"> {{postData[2].postTitle.view_num}}</i>
                     </div>
                 </div>
@@ -146,7 +152,6 @@ export default {
                     this.postData=[];
                     this.postData=res.data.postInfos;
                 }
-                console.log(this.postData)
             })
         },
         goPost(index){
@@ -158,7 +163,7 @@ export default {
                 method:'get'
             }).then(res=>{ 
                 if(res.data.code==200){
-                    if(this.postData[index].postTitleliked){
+                    if(this.postData[index].postTitle.liked){
                         this.postData[index].postTitle.like_num-=1;
                         this.postData[index].postTitle.liked=false;
                     }else{
@@ -169,18 +174,18 @@ export default {
             })
         },
         mark(index){
-            const loading = this.$loading({
-                lock: true,
-                target:document.getElementById('post'+this.postData[index].postTitle.id),
-                text: '操作中...',
-                spinner: 'el-icon-loading',
-                background: 'rgba(0, 0, 0, 0.7)'
-            });
+            // const loading = this.$loading({
+            //     lock: true,
+            //     target:document.getElementById('post'+this.postData[index].postTitle.id),
+            //     text: '操作中...',
+            //     spinner: 'el-icon-loading',
+            //     background: 'rgba(0, 0, 0, 0.7)'
+            // });
             this.axios({
                 url:apiHost+'/anon/post/collect?post_title_id='+this.postData[index].postTitle.id,
                 method:'get'
             }).then(res=>{
-                loading.close();
+                // loading.close();
                 if(res.data.code==200){
                     if(this.postData[index].postTitle.collected){
                         this.postData[index].postTitle.recommend_num-=1;

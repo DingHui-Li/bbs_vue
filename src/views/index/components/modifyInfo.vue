@@ -176,7 +176,7 @@ export default {
                         title: '修改成功',
                         type:'success'
                     });
-                    this.$router.go(-1);
+                    //this.$router.go(-1);
                 }
             })
         },

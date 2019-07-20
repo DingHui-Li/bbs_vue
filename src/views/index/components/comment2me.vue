@@ -4,10 +4,10 @@
 		<div slot="header" style="font-size:1.2rem;color:#757575;font-weight:bold">回复我的</div>
 		<el-scrollbar>
 			<div style="padding:10px 20px" v-for="i in 9" :key="'focus'+i">
-				<div style="width:55px;float:left">
-					<el-avatar src="http://static.simpledesktops.com/uploads/desktops/2014/03/12/Frutas.png" :size="55"></el-avatar>
+				<div style="width:40px;float:left">
+					<el-avatar src="http://static.simpledesktops.com/uploads/desktops/2014/03/12/Frutas.png" :size="40"></el-avatar>
 				</div>
-				<div style="margin-top:10px;padding-left:60px">
+				<div style="margin-top:10px;padding-left:45px">
 					<div style="font-weight:bold;color:#757575">任我行
 						<span style="float:right"><i class="fa fa-trash-o" aria-hidden="true"></i></span>
 					</div>
@@ -23,8 +23,30 @@
 	</el-card>
 </template>
 <script>
+import { apiHost } from '../../../../apiConfig';
 export default {
-	name:'comment2me'
+	name:'comment2me',
+	data(){
+		return{
+			data:'',
+		}
+	},
+	mounted(){
+		this.getData();
+	},
+	methods:{
+		getData(){
+			this.axios({
+				url:apiHost+'/message/getMessage?type=11&page=1&size=20',
+				method:'get'
+			}).then(res=>{
+				console.log(res)
+				if(res.data.code==200){
+					this.data=res.data.data;
+				}
+			})
+		},
+	}
 }
 </script>
 <style>

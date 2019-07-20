@@ -1,12 +1,12 @@
 <template>
 	<el-row type="flex" justify="center" :gutter="10">
 		<el-col>
-			<el-card style="padding:0">
+			<el-card style="padding:0;box-shadow:none;border:none">
 				<div id="plateChart" style="width:100%;height:500px"></div>
 			</el-card>
 		</el-col>
 		<el-dialog :visible.sync="modifyPlateDialog" title="修改板块">
-			<el-button style="width:100%;background-color:red;color:#fff;margin-bottom:20px" @click="deletePlate()">删除该板块</el-button>
+			<el-button style="width:100%;background-color:red;color:#fff;margin-bottom:20px" @click="deletePlate()"  v-if="role>3">删除该板块</el-button>
 			<el-input v-model="modifyPlateData.plate_name" maxlength='10' show-word-limit>
 				<template slot="append">
 					<el-button style="background-color:#2196F3;color:#fff;" @click="modifyPlate()">确认修改</el-button>
@@ -31,7 +31,7 @@
 			</div>
 		</el-dialog>
 		<el-dialog :visible.sync="modifyDistrictDialog" title="修改分区">
-			<el-button style="width:100%;background-color:red;color:#fff;margin-bottom:20px" @click="deleteDistrict()">删除该分区</el-button>
+			<el-button style="width:100%;background-color:red;color:#fff;margin-bottom:20px" @click="deleteDistrict()" v-if="role>2">删除该分区</el-button>
 			<el-input v-model="modifyDistrictData.district_name" maxlength='10' show-word-limit>
 				<template slot="append">
 					<el-button style="background-color:#2196F3;color:#fff;" @click="modifyDistrict()">确认修改</el-button>
@@ -77,6 +77,7 @@ import echarts from 'echarts'
 
 import { apiHost, imgHost } from '../../../../apiConfig';
 export default {
+	props:['role'],
 	data(){
 		return{
 			plateData:[],
@@ -110,18 +111,26 @@ export default {
 		this.getPlateData();
 		this.init();
 	},
+	beforeRouteEnter(to,from,next){
+		next(vm=>{
+			if(vm.role<3){
+				vm.$message.error('权限不足');
+				vm.$router.replace(from.path);
+			}
+		})
+	},
 	methods:{
 		geturl(url){
 			return imgHost+url;
 		},
 		getPlateData(){
             this.axios({
-                url:apiHost+"/anon/plate/getPlates",
+                url:apiHost+"/admin/getPlates",
                 method:"get"
             }).then(res=>{
-                if(res!=undefined){
+                if(res.data.code==200){
 					this.plateData={'name':'狗扑','children':[]};
-					this.plateData.children=res.data.map(plate=>{
+					this.plateData.children=res.data.data.map(plate=>{
 						let children=plate.districtInfos.map(district=>{
 							return {'name':district.district_name,
 									'value':district.post_num,
@@ -130,10 +139,14 @@ export default {
 									'type':'district'
 									}
 						});
-						children.push({'name':'+','plate_id':plate.id,'type':'addDist',itemStyle:{color:'#4CAF50',borderColor:'none'},})
+						if(this.role>=3){
+								children.push({'name':'+','plate_id':plate.id,'type':'addDist',itemStyle:{color:'#4CAF50',borderColor:'none'},})
+						}
 						return {'name':plate.plate_name,'children':children,'id':plate.id,'type':'plate'}
 					});
-					this.plateData['children'].push({'name':'+','type':'addPlate',itemStyle:{color:'#4CAF50',borderColor:'none'},})
+					if(this.role==4){
+						this.plateData['children'].push({'name':'+','type':'addPlate',itemStyle:{color:'#4CAF50',borderColor:'none'},})
+					}
 					this.plateChart.setOption({
 						series: [{
 							data: [this.plateData]
@@ -149,9 +162,9 @@ export default {
 					method:'post'
 				}).then(res=>{
 					if(res.data.code==200){
-						this.getPlateData();
-						this.addPlateData.plate_name="";
-						this.addPlateDialog=false;
+						this.$router.replace('/empty')
+						// this.addPlateData.plate_name="";
+						// this.addPlateDialog=false;
 						this.$notify({'title':'添加板块成功',type:"success"});
 					}else{
 						this.$notify.error(res.data.msg);
@@ -166,10 +179,11 @@ export default {
 					method:'post'
 				}).then(res=>{
 					if(res.data.code==200){
-						this.addDistrictDialog=false;
-						this.addDistrictData.district_name="";
+						this.$router.replace('/empty')
+						// this.addDistrictDialog=false;
+						// this.addDistrictData.district_name="";
 						this.$notify({'title':'添加分区成功',type:"success"});
-						this.getPlateData();
+						//this.getPlateData();
 					}else{
 						this.$notify.error('添加分区失败');
 					}
@@ -188,9 +202,10 @@ export default {
 		},
 		getDistrictModerator(){
 			this.axios({
-				url:apiHost+'/admin/getDisOwner?district_id='+this.modifyDistrictData.id+'&plate_id='+this.modifyDistrictData.plate_id,
+				url:apiHost+'/admin/getDisOwner?district_id='+this.modifyDistrictData.id,
 				method:'get'
 			}).then(res=>{
+				console.log(res)
 				if(res.data.code==200){
 					this.modifyDistrictData.moderator=res.data.ls;
 				}
@@ -206,7 +221,7 @@ export default {
 					this.axios({
 						url:apiHost+'/admin/addPlateModerator',
 						method:'post',
-						data:{'user_id':value,'plate_id':this.modifyPlateData.id,'district_id':'-1'}
+						data:{'user_id':value,'plate_id':this.modifyPlateData.id}
 					}).then(res=>{
 						if(res.data.code==200){
 							this.getModerator();
@@ -275,8 +290,9 @@ export default {
 					method:'post'
 				}).then(res=>{
 					if(res.data.code==200){
-						this.getPlateData();
-						this.modifyPlateDialog=false;
+						this.$router.replace('/empty')
+						//this.getPlateData();
+						//this.modifyPlateDialog=false;
 						this.$notify({'title':'删除板块成功',type:"success"});
 					}else{
 						this.$notify.error('删除板块失败');
@@ -295,8 +311,9 @@ export default {
 					method:'post'
 				}).then(res=>{
 					if(res.data.code==200){
-						this.getPlateData();
-						this.modifyDistrictDialog=false;
+						this.$router.replace('/empty')
+						// this.getPlateData();
+						// this.modifyDistrictDialog=false;
 						this.$notify({'title':'删除分区成功',type:"success"});
 					}else{
 						this.$notify.error('删除分区失败');
@@ -312,7 +329,8 @@ export default {
 				}).then(res=>{
 					if(res.data.code==200){
 						this.$notify({'title':'修改板块成功',type:"success"});
-						this.getPlateData();
+						//this.getPlateData();
+						this.$router.replace('/empty')
 					}else{
 						this.$notify.error('修改板块失败');
 					}
@@ -330,7 +348,8 @@ export default {
 				}).then(res=>{
 					if(res.data.code==200){
 						this.$notify({'title':'修改分区成功',type:"success"});
-						this.getPlateData();
+						//this.getPlateData();
+						this.$router.replace('/empty')
 					}else{
 						this.$notify.error('修改分区失败');
 					}

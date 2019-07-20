@@ -116,7 +116,8 @@ export default {
     components:{comment,comments,fab},
     data(){
         return{
-            id:this.$route.params.id,//帖子id
+            id:this.$route.params.id,//帖子id,
+            toCountentId:this.id,
             postData:{},
             userData:{},
             userPostData:[],
@@ -173,8 +174,7 @@ export default {
             })
         },
         toContent(id){
-            this.$router.push(`/content/${id}`);
-            this.$router.replace('/empty');
+            this.toCountentId=id;
         },
         like(){
             const loading = this.$loading({
@@ -231,6 +231,12 @@ export default {
             this.id=newVal.params.id;
             this.getContent();
         },
+        toCountentId:function(newVal,oldVal){
+            if(newVal!=this.id){
+                this.$router.push(`/content/${newVal}`);
+                this.$router.replace('/empty');
+            }
+        }
     }
 }
 </script>

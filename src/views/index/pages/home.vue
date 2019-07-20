@@ -80,7 +80,7 @@ export default {
         console.log('moumnted')
         this.getPlate();
         this.getHomeData();
-        this.getNotice(-1,-1);
+        this.getNotice(0,0);
     },
     beforeRouteEnter(to,from,next){
         next(vm=>{
@@ -142,8 +142,8 @@ export default {
                 }
                 this.plateNotice=[];
                 this.districtNotice=[];
-                this.getNotice(this.plates[tab.name].id,-1);
-                this.getNotice(-1, this.actDistrict);
+                this.getNotice(this.plates[tab.name].id,0);
+                this.getNotice(0, this.actDistrict);
             }
             if(tab.name=='more'){
                 this.$router.push('/plate');
@@ -152,7 +152,7 @@ export default {
         handleClick(tab, event) {//子选项卡改变事件
             this.actDistrict=tab.name;
             this.districtNotice=[];
-            this.getNotice(-1, this.actDistrict);
+            this.getNotice(0, this.actDistrict);
         },
         getHomeData(){
             this.homePageMsg="加载中...";
@@ -222,14 +222,13 @@ export default {
                 url:apiHost+'/anon/getRecentAnnouncement?plate_id='+plate_id+'&district_id='+district_id,
                 method:'get'
             }).then(res=>{
-                // console.log(res)
                 if(res.data.code==200){
-                    if(plate_id==-1&&district_id==-1){
+                    if(plate_id==0&&district_id==0){
                         this.totalNotice=res.data;
                     }
-                    else if(plate_id!=-1&&district_id==-1){
+                    else if(plate_id!=0&&district_id==0){
                         this.plateNotice=res.data;
-                    }else if(plate_id==-1&&district_id!=-1){
+                    }else if(plate_id==0&&district_id!=0){
                         this.districtNotice=res.data;
                     }
                 }
