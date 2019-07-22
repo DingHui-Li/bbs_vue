@@ -168,10 +168,10 @@ export default {
                         this.homePageMsg='你找到了我的底线';
                         return;
                     }
-                    this.homePageMsg="下拉加载更多"
                     for(let i=0;i<res.data.PostTitleList.length;i++){
                         this.homeData.push(res.data.PostTitleList[i])
                     }
+                    this.homePageMsg="下拉加载更多"
                 }else{
                     this.homePageMsg="加载失败";
                 }

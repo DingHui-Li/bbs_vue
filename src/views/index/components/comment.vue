@@ -38,6 +38,43 @@ export default {
                 'link',  // 插入链接
                 'emoticon',  // 表情
             ];
+            editor.customConfig.emotions = [
+                {
+                    // tab 的标题
+                    title: '默认',
+                    // type -> 'emoji' / 'image'
+                    type: 'image',
+                    // content -> 数组
+                    content: [
+                        {
+                            alt: '[坏笑]',
+                            src: 'http://img.t.sinajs.cn/t4/appstyle/expression/ext/normal/50/pcmoren_huaixiao_org.png'
+                        },{
+                            alt: '[舔屏]',
+                            src: 'http://img.t.sinajs.cn/t4/appstyle/expression/ext/normal/40/pcmoren_tian_org.png'
+                        },{
+                            alt:"[喵喵]",
+                            src:"http://img.t.sinajs.cn/t4/appstyle/expression/ext/normal/7b/2018new_miaomiao_org.png",
+                        },{
+                            alt:"[悲伤]",src:"http://img.t.sinajs.cn/t4/appstyle/expression/ext/normal/ee/2018new_beishang_org.png"
+                        },{
+                            alt:"[吃惊]",src:"http://img.t.sinajs.cn/t4/appstyle/expression/ext/normal/49/2018new_chijing_org.png"
+                        },{
+                            alt:"[偷笑]",src:"http://img.t.sinajs.cn/t4/appstyle/expression/ext/normal/71/2018new_touxiao_org.png"
+                        },{
+                            alt:"[疑问]",src:"http://img.t.sinajs.cn/t4/appstyle/expression/ext/normal/b8/2018new_ningwen_org.png"
+                        },{
+                            alt:"[顶]",src:"http://img.t.sinajs.cn/t4/appstyle/expression/ext/normal/ae/2018new_ding_org.png"
+                        },{
+                            alt:"[互粉]",src:"http://img.t.sinajs.cn/t4/appstyle/expression/ext/normal/86/2018new_hufen02_org.png",
+                        },{
+                            alt:"[并不简单]",src:"http://img.t.sinajs.cn/t4/appstyle/expression/ext/normal/aa/2018new_bingbujiandan_org.png"
+                        },{
+                            alt:"[笑而不语]",src:"http://img.t.sinajs.cn/t4/appstyle/expression/ext/normal/2d/2018new_xiaoerbuyu_org.png"
+                        }
+                    ]
+                }
+            ]
             editor.create();
 			this.editor=editor;
         },
@@ -46,7 +83,7 @@ export default {
                 let content=this.editor.txt.html();
                 let contetn_txt=this.editor.txt.text();
                 if(contetn_txt.trim().length==0){
-                    this.$message.error('不能为空')
+                    this.$message.error('不能为空或只发送表情')
                         return;
                 }
                 const loading = this.$loading({

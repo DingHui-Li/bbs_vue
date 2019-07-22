@@ -12,7 +12,7 @@
 							<el-menu-item @click="select=0">
 								<i class="fa fa-circle" aria-hidden="true" style="font-size:0.5rem;color:#757575"></i>
 								<span class="leftItem" style="margin-right:10px;color:#757575">回复我的</span> 
-								<el-badge style="margin-left:5px" :value="messageNum.post" v-if="badgeType!='hidden'&&messageNum.post!=0" :is-dot="badgeType=='dot'"></el-badge>
+								<el-badge style="margin-left:5px" :value="messageNum.reply" v-if="badgeType!='hidden'&&messageNum.reply!=0" :is-dot="badgeType=='dot'"></el-badge>
 							</el-menu-item>
 							<el-menu-item @click="select=1">
 								<i class="fa fa-circle" aria-hidden="true" style="font-size:0.5rem;color:#757575"></i>

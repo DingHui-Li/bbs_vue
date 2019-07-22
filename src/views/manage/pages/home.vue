@@ -2,13 +2,19 @@
 	<el-row id="home">
 		<el-col style="padding:0">
 			<el-col :xs="24" :lg='8' class="infoCardContainer">
-				<el-col :xs='12' :sm="6" :md="6" :lg="12" style="padding:10px" v-for="(item,index) in countData" :key="index" >
+				<el-col :xs='12' :lg="12" style="padding:10px" v-for="(item,index) in totalNum" :key="'total'+index" >
 					<el-card class="infoCard" >
-						<div align="center" style="margin-top:25%">
-							<div >
+						<div style="font-size:30px;padding:0" slot="header">
+							<i class="fa fa-file-text" aria-hidden="true" v-if="index==0"></i>
+							<i class="fa fa-user" aria-hidden="true" v-if="index==1"></i>
+							<i class="fa fa-square" aria-hidden="true" v-if="index==2"></i>
+							<i class="fa fa-th-large" aria-hidden="true" v-if="index==3"></i>
+							<div style="font-weight:bold;font-size:0.9rem;float:right;line-height:4rem">
 								{{item.name}}
 							</div>
-							<div>
+						</div>
+						<div align="center">
+							<div style="font-weight:bold;font-size:20px">
 								{{item.value}}
 							</div>
 						</div>
@@ -17,19 +23,26 @@
 			</el-col>
 			<el-col :xs="24" :lg="16" style="padding:10px">
 				<el-card >
-					<div style="width:100%;" id="chart1" class="charts"></div>
+					<div style="width:100%;" id="chart1" class="charts" align="center"></div>
 				</el-card>
 			</el-col>
 		</el-col>
 		<el-col style="padding:0;margin-top:30px">
 			<el-col :xs="24" :lg='8' class="infoCardContainer">
-				<el-col :xs='24' :md="12" style="padding:10px" v-for="(item,index) in countData" :key="index" >
-					<el-card class="infoCard">
-						<div align="center" style="margin-top:25%">
-							<div >
+				<el-col :xs='24' :lg="12" style="padding:10px" v-for="(item,index) in todayData" :key="index" >
+					<el-card class="infoCard" style="font-weight:bold" :style="{color:color[index]}">
+						<div style="font-size:30px">
+							<i class="fa fa-star" aria-hidden="true" v-if="index==0" ></i>
+							<i class="fa fa-heart" aria-hidden="true"  v-else-if="index==1"></i>
+							<i class="fa fa-pencil" aria-hidden="true" v-else-if="index==2" ></i>
+							<i class="fa fa-comments" aria-hidden="true" v-else-if="index==3"></i>
+						</div>
+						
+						<div align="center">
+							<div style="font-size:0.9rem">
 								{{item.name}}
 							</div>
-							<div>
+							<div style="font-size:1.5rem">
 								{{item.value}}
 							</div>
 						</div>
@@ -37,9 +50,9 @@
 				</el-col>
 			</el-col>
 			<el-col :xs="24" :lg="16" >
-				<el-col :xs='24' :xl="12" style="padding:10px">
+				<el-col style="padding:10px">
 					<el-card>
-						<div style="width:100%;" id="chart2" class="charts"></div>
+						<div style="width:100%;" id="chart2" class="charts" align="center"></div>
 					</el-card>
 				</el-col>
 			</el-col>
@@ -54,28 +67,47 @@ export default {
 	components:{charts},
 	data(){
 		return{
-			countData:[
+			todayData:[
 				{'name':'今日收藏','value':0,},
 				{'name':'今日喜欢','value':0,},
 				{'name':'今日发帖','value':0,},
-				// {'name':'今日注册','value':0},
 				{'name':'今日回复','value':0},
 			],
-			plateData:[]
+			totalNum:[
+				{'name':'总帖数','value':0},
+				{'name':'总用户','value':0},
+				{'name':'总板块数','value':0},
+				{'name':'总分区数','value':0},
+			],
+			registerNum:'',
+			postNum:'',
+			plateData:[],
+			color:['#4CAF50','#8BC34A','#CDDC39','#388E3C'],
 		}
 	},
 	mounted(){
 		this.getData();
 		this.setSize();
-		this.initChart();
+	},
+	beforeRouteEnter(to,from,next){
+		next(vm=>{
+			if(vm.role<4){
+				vm.$message.error('权限不足');
+				vm.$router.replace('/postManage');
+			}
+		})
 	},
 	methods:{
+		dateFormat(date){
+			let d=new Date(date);
+			return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getUTCDate();
+        },
 		setSize(){
 			let card=document.getElementsByClassName('infoCard');
 			let width=card[0].offsetWidth;
-			for(let i=0;i<card.length;i++){
-				card[i].style.height=width-40+'px';
-			}
+			// for(let i=0;i<card.length;i++){
+			// 	card[i].style.height=width-40+'px';
+			// }
 			let height=document.getElementsByClassName('infoCardContainer')[0].offsetHeight;
 			
 			let charts=document.getElementsByClassName('charts');
@@ -88,136 +120,107 @@ export default {
 				url:apiHost+'/admin/getHomeMessage',
 				method:'get'
 			}).then(res=>{
-				console.log(res.data)
 				if(res.data.code==200){
-					let i=0;
-					for(let key in res.data.data){
-						if(key!='registNum'){
-							this.countData[i].value=res.data.data[key];
-							i++;
-						}
-					}
+					// console.log(res.data.data)
+					this.todayData[0].value=res.data.data.collectNum;
+					this.todayData[1].value=res.data.data.likeNum;
+					this.todayData[2].value=res.data.data.postNum;
+					this.todayData[3].value=res.data.data.replyNum;
+
+					this.totalNum[0].value=res.data.data.postTotalNum;
+					this.totalNum[1].value=res.data.data.userNum;
+					this.totalNum[2].value=res.data.data.plateNum;
+					this.totalNum[3].value=res.data.data.disNum;
+
+					this.registerNum=res.data.data.registNumList.map(item=>{
+						return[this.dateFormat(item.time),item.num]
+					});
+					this.postNum=res.data.data.postNumList.map(item=>{
+						return[this.dateFormat(item.time),item.num]
+					});
+					// console.log(this.postNum)
+					// console.log(this.registerNum)
+					this.initChart();
 					this.initChart2();
 				}
 			})
 		},
 		initChart(){
-			var dom = document.getElementById("chart1");
-			var myChart = echarts.init(dom);
-			var app = {};
+			let date;
+			if(this.registerNum.length>=this.postNum.length){
+				date=this.registerNum.map(item=>{
+					return item[0];
+				})
+			}else{
+				date=this.postNum.map(item=>{
+					return item[0];
+				})
+			}
+			date.unshift('日期');
+			let registerNum=this.registerNum.map(item=>item[1]);
+			registerNum.unshift('每日注册');
+			let postNum=this.postNum.map(item=>item[1]);
+			postNum.unshift('每日发帖');	
+			var myChart = echarts.init(document.getElementById('chart1'));
 			let option = null;
-			// app.title = '嵌套环形图';
 			option = {
-				title: {
-					text: '论坛的活跃与新会员',
-					subtext: '',
-					x: 'center'
-				},
+				legend: {},
 				tooltip: {
 					trigger: 'axis',
-					axisPointer: {
-						type: 'cross',
-						crossStyle: {
-							color: 'rgba(155, 123, 243, 0.685)'
-						}
-					}
+					// showContent: false
 				},
-				legend: {
-					data: ['新会员人数', '月活跃'],
-					bottom: 0
+				dataset: {
+					source: [
+						date,
+						registerNum,
+						postNum,
+					]
 				},
-				xAxis: [
-					{
+				xAxis: {
 						type: 'category',
-						data: ['January', 'Febuary', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-						axisPointer: {
-							type: 'shadow'
+						axisLine:{
+							lineStyle:{
+								color:'rgba(75, 120, 218, 0.527)',
+								width:1.5
+							}
 						}
-					}
-				],
-				yAxis: [
-					{
-						type: 'value',
-						name: '新会员人数(个)',
-						min: 0,
-						max: 1600,
-						interval: 400,
-						axisLabel: {
-							formatter: '{value}'
-						},
-						nameLocation:'center',
-						nameGap:65
 					},
-					{
-						type: 'value',
-						name: '月活跃(次数)',
-						min: 0,
-						max: 60000,
-						// interval: 15000,
-						axisLabel: {
-							formatter: '{value}'
+				yAxis: {
+						gridIndex: 0,
+						"splitLine": {     //网格线
+							"show": false
 						},
-						nameLocation:'center',
-						nameGap:65,
-						nameRotate:-90
-					}
-				],
+						axisLine:{
+							lineStyle:{
+								color:'rgba(75, 120, 218, 0.527)',
+								width:1.5
+							}
+						}
+					},
 				series: [
-				{
-						name: '新会员人数',
-						type: 'bar',
-						data: [229.6, 530, 684, 296, 707, 970, 796, 1366, 290, 60, 499,500],
-						barWidth: '30%',
-						itemStyle: {
-							normal: {
-								color: 'rgba(75, 120, 218, 0.527)'
-							}
-						}
-				},
-				{
-						name: '月活跃',
-						type: 'bar',
-						yAxisIndex: 1,
-						data: [13061, 17500, 32178, 13273, 33075, 51490, 47863, 34493, 13500, 3200, 23498,23000],
-						barWidth: '30%',
-						itemStyle: {
-							normal: {
-								color: 'rgba(206, 191, 248, 0.685)'
-							}
-						}
-				}
+					{type: 'bar', smooth: true, seriesLayoutBy: 'row', itemStyle: {
+                        normal: {
+                            color: 'rgba(75, 120, 218, 0.527)'
+                        }
+                    }},
+					{type: 'bar', smooth: true, seriesLayoutBy: 'row',itemStyle: {
+                        normal: {
+                            color: 'rgba(206, 191, 248, 0.685)'
+                        }
+                    }},
 				]
 			};
-				if (option && typeof option === "object") {
-					myChart.setOption(option, true);
-				}
+			myChart.setOption(option);
 		},
 		initChart2(){
 			var myChart = echarts.init(document.getElementById('chart2'));
 			let option = {
-				// tooltip: {//提示框，可以在全局也可以在
-				// 	trigger: 'item',  //提示框的样式
-				// 	formatter: "{a} <br/>{b}: {c} ({d}%)",
-				// 	color:'#000', //提示框的背景色
-				// 	textStyle:{ //提示的字体样式
-				// 		color:"black",
-				// 	}
-				// },
-				// legend: {  //图例
-				// 	orient: 'vertical',  //图例的布局，竖直    horizontal为水平
-				// 	x: 'right',//图例显示在右边
-				// 	data:['今日收藏数','今日点赞数','今日评论数','今日浏览量'],
-				// 	textStyle:{    //图例文字的样式
-				// 		color:'#333',  //文字颜色
-				// 		fontSize:12    //文字大小
-				// 	}
-				// },
 				series: [
 					{
 						type:'pie', //环形图的type和饼图相同
-						radius: ['50%', '70%'],//饼图的半径，第一个为内半径，第二个为外半径
+						// radius: ['50%', '70%'],//饼图的半径，第一个为内半径，第二个为外半径
 						avoidLabelOverlap: false,
-						color:['#fdebbb','#ff7c82','#ffa35a','#4c4c4c'],
+						color:this.color,
 						label: {
 							normal: {  //正常的样式
 								show: true,
@@ -229,15 +232,10 @@ export default {
 									fontSize: '20',
 									fontWeight: 'bold'
 								}
-							}
-						},  //提示文字
-						// labelLine: {
-						// 	normal: {
-						// 		show: false
-						// 	}
-						// },
-						data:this.countData
-						
+							},
+						}, 
+						data:this.todayData.sort(function (a, b) { return a.value - b.value; }),
+						roseType: 'radius',
 					}
 				]
 			};
@@ -251,6 +249,9 @@ export default {
 		box-shadow:none;
 		border:none
 	}
+	/* #home .el-card__header{
+		padding:0 20px
+	} */
 	.infoCard{
 		color:#2196F3
 	}

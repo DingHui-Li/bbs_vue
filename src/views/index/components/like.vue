@@ -4,8 +4,8 @@
 		<div slot="header" style="font-size:1.2rem;color:#757575;font-weight:bold">系统通知</div>
 		<el-scrollbar>
 			<div style="padding:10px 20px" v-for="(message,index) in data" :key="'systemMsg'+index">
-				<div style="width:40px;float:left;cursor:pointer"  @click="$router.push(`/person/${message.userBaseInfo.user_id}`)">
-					<el-avatar :src="geturl(message.userBaseInfo.icon)" :size="40"></el-avatar>
+				<div style="width:35px;float:left;cursor:pointer"  @click="$router.push(`/person/${message.userBaseInfo.user_id}`)">
+					<el-image :src="geturl(message.userBaseInfo.icon)" style="width:35px;height:35px;border-radius:50%"></el-image>
 				</div>
 				<div style="margin-top:10px;padding-left:45px">
 					<div style="font-weight:bold;color:#757575;cursor:pointer" @click="$router.push(`/person/${message.userBaseInfo.user_id}`)">{{message.userBaseInfo.nick_name}}</div>

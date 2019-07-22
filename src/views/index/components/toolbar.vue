@@ -18,7 +18,7 @@
                     <el-submenu index="5" class="hidden-sm-and-down">
                         <template slot="title">消息 <el-badge :value="messageNum.total" v-if="messageNum.total!=0"></el-badge></template>  
                         <el-menu-item index="/news/system" align="center" @click="$router.replace(`/news/${'system'}`)">系统通知<el-badge :value="messageNum.system" v-if="messageNum.system!=0" style="margin-left:5px"></el-badge></el-menu-item>
-                        <el-menu-item index="news/msg" align="center" @click="$router.replace(`/news/${'msg'}`)">回复我<el-badge :value="messageNum.post" v-if="messageNum.post!=0" style="margin-left:5px"></el-badge></el-menu-item>
+                        <el-menu-item index="news/msg" align="center" @click="$router.replace(`/news/${'msg'}`)">回复我<el-badge :value="messageNum.replay" v-if="messageNum.reply!=0" style="margin-left:5px"></el-badge></el-menu-item>
                     </el-submenu>
                     <el-submenu index="6" class="hidden-sm-and-down" v-if="islogin">
                         <template slot="title">
@@ -61,7 +61,7 @@
 <script>
 import {apiHost,imgHost} from '../../../../apiConfig.js'
 import search from '../components/search'
-import { setTimeout } from 'timers';
+import { setTimeout, setInterval } from 'timers';
 export default {
     name:'toolbar',
     components:{search},
@@ -89,13 +89,11 @@ export default {
         this.active=this.$route.path;
         this.center();
         this.checkSession();
-        this.getMessageNum();
-    },
-    updated(){
-        
+        setInterval(this.getMessageNum(),1000*60*5);
     },
     methods:{
         getMessageNum(){
+            console.log("1");
             this.axios({
                 url:apiHost+'/message/getMessageNum',
                 method:'get'
