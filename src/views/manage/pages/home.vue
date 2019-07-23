@@ -138,29 +138,29 @@ export default {
 					this.postNum=res.data.data.postNumList.map(item=>{
 						return[this.dateFormat(item.time),item.num]
 					});
-					// console.log(this.postNum)
-					// console.log(this.registerNum)
+					console.log(this.postNum)
+					console.log(this.registerNum)
 					this.initChart();
 					this.initChart2();
 				}
 			})
 		},
 		initChart(){
-			let date;
-			if(this.registerNum.length>=this.postNum.length){
-				date=this.registerNum.map(item=>{
-					return item[0];
-				})
-			}else{
-				date=this.postNum.map(item=>{
-					return item[0];
-				})
-			}
-			date.unshift('日期');
-			let registerNum=this.registerNum.map(item=>item[1]);
-			registerNum.unshift('每日注册');
-			let postNum=this.postNum.map(item=>item[1]);
-			postNum.unshift('每日发帖');	
+			// let date;
+			// if(this.registerNum.length>=this.postNum.length){
+			// 	date=this.registerNum.map(item=>{
+			// 		return item[0];
+			// 	})
+			// }else{
+			// 	date=this.postNum.map(item=>{
+			// 		return item[0];
+			// 	})
+			// }
+			// date.unshift('日期');
+			// let registerNum=this.registerNum.map(item=>item[1]);
+			// registerNum.unshift('每日注册');
+			// let postNum=this.postNum.map(item=>item[1]);
+			// postNum.unshift('每日发帖');	
 			var myChart = echarts.init(document.getElementById('chart1'));
 			let option = null;
 			option = {
@@ -169,13 +169,11 @@ export default {
 					trigger: 'axis',
 					// showContent: false
 				},
-				dataset: {
-					source: [
-						date,
-						registerNum,
-						postNum,
-					]
-				},
+				// dataset: {
+				// 	source: 
+				// 		this.postNum
+					
+				// },
 				xAxis: {
 						type: 'category',
 						axisLine:{
@@ -198,15 +196,24 @@ export default {
 						}
 					},
 				series: [
-					{type: 'bar', smooth: true, seriesLayoutBy: 'row', itemStyle: {
-                        normal: {
-                            color: 'rgba(75, 120, 218, 0.527)'
-                        }
+					{
+						name:'每日注册',
+						type: 'bar', smooth: true, seriesLayoutBy: 'row',
+						data:this.registerNum,
+
+						itemStyle: {
+							normal: {
+								color: 'rgba(206, 191, 248, 0.685)'
+							}
                     }},
-					{type: 'bar', smooth: true, seriesLayoutBy: 'row',itemStyle: {
-                        normal: {
-                            color: 'rgba(206, 191, 248, 0.685)'
-                        }
+					{
+						name:'每日发帖',
+						type: 'bar', smooth: true, seriesLayoutBy: 'row', 
+						data:this.postNum,
+						itemStyle: {
+							normal: {
+								color: 'rgba(75, 120, 218, 0.527)'
+							}
                     }},
 				]
 			};
